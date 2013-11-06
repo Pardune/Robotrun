@@ -1,13 +1,30 @@
 package Controller;
 
-public class RobotController {
+import java.util.*;
+import robot.Robot;
 
+public class RobotController implements Observer {
+	private Robot[] robots;
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+	public RobotController(){
+		robots[0] = new Robot();
+		robots[1] = new Robot();
+		
+		init();
 	}
+	private void init() {
+		// let robots search for podests
+		
+		// somehow (?) evaluate which robot gets the Can initially
+		
+		// assign roles to Robots (fetch the can / get in position to receive the can)
+		// start communication between Robots
+		
+		
+	}
+	
+	
 
 }
