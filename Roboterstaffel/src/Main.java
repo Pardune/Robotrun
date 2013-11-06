@@ -12,7 +12,7 @@ import robot.*;
 public class Main {
 
 	private int eineVariable;
-	private static Staffelroboter robot;
+	private Robot robot;
 	/**
 	 * @param args
 	 */
@@ -20,4 +20,4 @@ public class Main {
 		robot = new Robot();
 	}
 
-}b
+}

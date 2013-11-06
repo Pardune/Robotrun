@@ -1,6 +1,7 @@
 package robot;
 
 public class Robot {
+	private int 
 
 	/**
 	 * @param args
