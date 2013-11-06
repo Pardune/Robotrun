@@ -8,7 +8,7 @@ public class Robot {
 	 */
 	public Robot() {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 }

@@ -10,14 +10,12 @@
 import robot.*;
 
 public class Main {
-
-	private int eineVariable;
-	private Robot robot;
+	private RobotController robotController;
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		robot = new Robot();
+		robotController = new RobotController();
 	}
 
 }
