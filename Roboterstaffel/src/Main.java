@@ -8,6 +8,7 @@
  */
 public class Main {
 
+	private int eineVariable;
 	/**
 	 * @param args
 	 */
