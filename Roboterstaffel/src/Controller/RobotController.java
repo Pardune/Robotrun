@@ -4,15 +4,16 @@ import java.util.*;
 import robot.Robot;
 
 public class RobotController implements EventListener {
-	private Robot[] robots;
+	private Robot robot;
 	/**
 	 * @param args
 	 */
 	public RobotController(){
-		robots[0] = new Robot();
-		robots[1] = new Robot();
-		robots[0].addEventListener(this);
-		robots[1].addEventListener(this);
+		robot = new Robot();
+
+		
+		robot.addEventListener(this);
+
 		
 		init();
 	}

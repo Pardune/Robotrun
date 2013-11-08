@@ -22,13 +22,16 @@ public class Robot implements Observable{
 		
 	}
 	
+	
+	
 	private void go(){
 		pilot.travel(20, true);
 		while (distanceSensor.getDistance() <= 40 ) {
 			if (true) pilot.stop();
 		}
-		pilot.;
+		//pilot.;
 		
+	
 	}
 
 	/**

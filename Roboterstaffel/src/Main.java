@@ -7,6 +7,7 @@
  *
  */
 
+import Controller.RobotController;
 import robot.*;
 
 public class Main {
