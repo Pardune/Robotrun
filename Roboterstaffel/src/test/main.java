@@ -25,6 +25,8 @@ public class main {
 				maxDistanceRot = i+4;
 			}
 		}
+		System.out.println("          " + rotationArray[maxDistanceRot]);
+		
 		if(maxDistanceRot < 36) {
 			return maxDistanceRot;
 		} else return maxDistanceRot - 72;
@@ -35,7 +37,7 @@ public class main {
 	static int findPeak(int[] rotationArray) {
 		int temp1;		//rotationArray temp
 		int temp2;		//sortArray temp
-		int[] rotationArray2 = rotationArray; 	//duplicate to sort distances in increasing order
+		int[] rotationArray2 = rotationArray.clone(); 	//duplicate to sort distances in increasing order
 		int[] sortArray = new int[72];			//array index links to corresponding (increasing) distances in rotation Array
 												//e.g. biggest distance -> rotationArray[sortArray[0]]
 		
@@ -92,8 +94,8 @@ public class main {
 		
 		Button.waitForAnyPress();
 		
-		final DifferentialPilot pilot = new DifferentialPilot(43.2f, 160f, Motor.A, Motor.B, false); //161f if floor slippery
-		pilot.setAcceleration(50); //30 if floor slippery
+		final DifferentialPilot pilot = new DifferentialPilot(43.2f, 161f, Motor.A, Motor.B, false); //161f if floor slippery
+		pilot.setAcceleration(20); //30 if floor slippery
 		int peakRot;  //rotation direction of supposed can position
 		int peakDist; //distance to supposed can position
 		while(true){
@@ -128,6 +130,9 @@ public class main {
 				
 				int rotate = findMaxDistance(rotationArray)*5;
 				pilot.rotate(rotate);
+				Sound.setVolume(100);
+				Sound.playNote(Sound.FLUTE, 1500, 1000);
+				Sound.playNote(Sound.FLUTE, 1500, 1000);
 				while(pilot.isMoving())Thread.yield(); //wait till DifPilot has finished all tasks
 				pilot.travel(300);
 				while(pilot.isMoving())Thread.yield();
