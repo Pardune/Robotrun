@@ -145,9 +145,10 @@ public class main {
 		boolean grabbedCan = false;
 
 		Sound.setVolume(100);
-		if(peakRot >= 36) peakRot = peakRot - 72;		
-		pilot.rotate(peakRot*5);
+		if(peakRot >= 36) peakRot = peakRot - 72;	//turn max 180° 
+		pilot.rotate(peakRot*5);					//convert to degree and rotate
 		while(pilot.isMoving())Thread.yield();
+		
 		if(peakDist > 25) {
 			pilot.travel(120);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
