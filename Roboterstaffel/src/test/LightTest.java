@@ -19,11 +19,15 @@ public class LightTest {
 		pilot = new DifferentialPilot(43.2f, 161f, Motor.A, Motor.B, false);
 		light = new LightSensor(SensorPort.S1);
 		dist = new UltrasonicSensor(SensorPort.S4);
-		
+		boolean hasCan;
 		//findWhitePaper();
 		//while (true)
-		checkLightValue();
-		followLine();
+		//checkLightValue();
+		while (true) {
+			getRawValue();
+		}
+		
+		//followLine();
 		//driveOnLine();
 		/*if (isLineLeft()== true ) {
 			Delay.msDelay(2000);
@@ -39,6 +43,10 @@ public class LightTest {
 		//Delay.msDelay(1000);
 	}
 	
+	public static void getRawValue() {
+		System.out.println("          " + light.readNormalizedValue());
+		Delay.msDelay(1000);
+	}
 	
 	public static void driveOnLine (){ //precondition: robot is in the line
 		while (true) {
