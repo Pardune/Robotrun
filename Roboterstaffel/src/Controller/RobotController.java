@@ -10,10 +10,6 @@ public class RobotController implements EventListener {
 	 */
 	public RobotController(){
 		robot = new Robot();
-
-		
-		robot.addEventListener(this);
-
 		
 		init();
 	}

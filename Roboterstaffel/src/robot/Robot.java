@@ -6,7 +6,7 @@ import lejos.nxt.UltrasonicSensor;
 import lejos.robotics.navigation.DifferentialPilot;
 import lejos.util.PilotProps;
 
-public class Robot implements Observable{
+public class Robot{
 
 	DifferentialPilot pilot;
 	UltrasonicSensor distanceSensor = new UltrasonicSensor(SensorPort.S1);
