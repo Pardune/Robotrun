@@ -1,5 +1,6 @@
 package test;
 
+import pardune.CommMaster;
 import lejos.nxt.Button;
 import lejos.nxt.LightSensor;
 import lejos.nxt.Motor;
@@ -198,6 +199,24 @@ public class main {
 //			lightSensor();
 //		};
 		
+		
+		//main method for robot 1
+		CommMaster nxt = new CommMaster();
+
+		DifferentialPilot pilot = new DifferentialPilot(43.2f, 160f, Motor.A, Motor.B, false);
+		test.main.mainAlgorithm(pilot);
+		test.LightTest.getOnLine();
+		
+		
+//		getInPos();
+//		sendReady();
+//		
+//		if (nxt.dis.readInt() == 1) {
+//			releaseCan();
+//		}
+//		
+//		nxt.end();
+		
 	}
 		
 	
@@ -209,38 +228,9 @@ public class main {
 		
 		while(true){
 			if(getLine()) {
-				System.out.println("       fuck");
 				foundLine();
 			}
-			Thread thread1 = new Thread() {		//thread for complete turn
-				public void run() {
-					pilot.rotate(360);
-				}
-			};
-			thread1.start();
-			
-			UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
-				int[] rotationArray = new int[81];
-
-				for(int rotation = 0; rotation < 72; rotation++ ) {
-					while (rotation*5 > pilot.getAngleIncrement()) { //every 5°
-						Delay.msDelay(1);
-					}
-					rotationArray[rotation]=us.getDistance();		 //save distance
-//					Sound.playNote(Sound.FLUTE, 3000 - (20*rotationArray[rotation]), 10);
-					System.out.println("          " + rotationArray[rotation]);
-			
-				}
-			
-			rotationArray[72]=rotationArray[0];		//let measurements overlap
-			rotationArray[73]=rotationArray[1];
-			rotationArray[74]=rotationArray[2];
-			rotationArray[75]=rotationArray[3];
-			rotationArray[76]=rotationArray[4];
-			rotationArray[77]=rotationArray[5];
-			rotationArray[78]=rotationArray[6]; 
-			rotationArray[79]=rotationArray[7];
-			rotationArray[80]=rotationArray[8];
+			int[] rotationArray = rotateNscan();
 			
 			peakRot = findPeak(rotationArray);
 			
@@ -260,9 +250,43 @@ public class main {
 			}
 			peakDist = rotationArray[peakRot];
 			if(driveNGrabCan(peakRot, peakDist)) { //true when can found and grabbed
+				findLine();
 				break; 									  //stop for now -> for complete program add function here
 			}
 		}
+	}
+
+	private static int[] rotateNscan() {
+		Thread thread1 = new Thread() {		//thread for complete turn
+			public void run() {
+				pilot.rotate(360);
+			}
+		};
+		thread1.start();
+		
+		UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
+			int[] rotationArray = new int[81];
+
+			for(int rotation = 0; rotation < 72; rotation++ ) {
+				while (rotation*5 > pilot.getAngleIncrement()) { //every 5°
+					Delay.msDelay(1);
+				}
+				rotationArray[rotation]=us.getDistance();		 //save distance
+//				Sound.playNote(Sound.FLUTE, 3000 - (20*rotationArray[rotation]), 10);
+				System.out.println("          " + rotationArray[rotation]);
+		
+			}
+		
+		rotationArray[72]=rotationArray[0];		//let measurements overlap
+		rotationArray[73]=rotationArray[1];
+		rotationArray[74]=rotationArray[2];
+		rotationArray[75]=rotationArray[3];
+		rotationArray[76]=rotationArray[4];
+		rotationArray[77]=rotationArray[5];
+		rotationArray[78]=rotationArray[6]; 
+		rotationArray[79]=rotationArray[7];
+		rotationArray[80]=rotationArray[8];
+		return rotationArray;
 	}
 
 	private static boolean getLine() {
@@ -276,6 +300,15 @@ public class main {
 	public static void foundLine() {
 		pilot.rotate(180);
 		pilot.travel(500);
+	}
+	
+	public static void findLine() {
+		while(true) {
+			int [] rotationArray = rotateNscan();
+			int angle = findMaxDistance(rotationArray);
+			if(rotate(angle * 5)) break;
+			if(drive(450)) break;
+		}
 	}
 
 	static boolean driveNGrabCan(int peakRot, int peakDist) {

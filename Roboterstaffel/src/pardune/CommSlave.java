@@ -13,7 +13,7 @@ import lejos.nxt.comm.BTConnection;
 import lejos.nxt.comm.Bluetooth;
 
 public class CommSlave {
-	// fields for constuctor CommMaster()
+	 // fields for constuctor CommMaster()
 	DataInputStream dis;
 	DataOutputStream dos;
 	BTConnection btc;
@@ -23,15 +23,20 @@ public class CommSlave {
 	// fields for sendData()
 	int data;
 
-	public CommSlave() throws Exception {
-		// setup for pcToSource()
-		btc = Bluetooth.waitForConnection();
-		dis = btc.openDataInputStream();
-		dos = btc.openDataOutputStream();
+	public CommSlave() {
+		try {
+			// setup for pcToSource()
+			btc = Bluetooth.waitForConnection();
+			dis = btc.openDataInputStream();
+			dos = btc.openDataOutputStream();
 
-		// setup for nxtToNxt()
-		btrd = Bluetooth.getKnownDevice(remoteName);
-		// setup end
+			// setup for nxtToNxt()
+			btrd = Bluetooth.getKnownDevice(remoteName);
+			// setup end
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public int recData(){
@@ -54,8 +59,12 @@ public class CommSlave {
 	
 	public static void main(String[] args) throws Exception{
 		CommSlave nxt = new CommSlave();
-		for (int i = 0; i < 10; i++) {
-			nxt.recData();
+		if (nxt.dis.readInt() == 1) {
+			searchLine();
+			getOnLine();
+			handover();
+			mainAlgo();
+			releaseCan();
 		}
 		nxt.end();
 	}

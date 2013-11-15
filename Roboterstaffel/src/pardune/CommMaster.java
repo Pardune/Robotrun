@@ -12,8 +12,10 @@ import java.io.PrintStream;
 
 import javax.bluetooth.RemoteDevice;
 
+import lejos.nxt.Motor;
 import lejos.nxt.comm.BTConnection;
 import lejos.nxt.comm.Bluetooth;
+import lejos.robotics.navigation.DifferentialPilot;
 
 public class CommMaster {
 	// fields for constuctor CommMaster()
@@ -26,18 +28,23 @@ public class CommMaster {
 	// fields for sendData()
 	int data;
 
-	public CommMaster() throws Exception {
-		// setup for pcToSource()
-		//btc = Bluetooth.waitForConnection();
-				
-		// setup for nxtToNxt()
-		btrd = Bluetooth.getKnownDevice(remoteName);
-		System.out.println("      " + 123);
-		btc = Bluetooth.connect(btrd);
-		System.out.println("      " + 345);
-		// setup end
-		dos = btc.openDataOutputStream();
-		dis = btc.openDataInputStream();
+	public CommMaster() {
+		try {
+			// setup for pcToSource()
+			//btc = Bluetooth.waitForConnection();
+					
+			// setup for nxtToNxt()
+			btrd = Bluetooth.getKnownDevice(remoteName);
+			System.out.println("      " + 123);
+			btc = Bluetooth.connect(btrd);
+			System.out.println("      " + 345);
+			// setup end
+			dos = btc.openDataOutputStream();
+			dis = btc.openDataInputStream();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public int sendData(int data){
@@ -61,9 +68,18 @@ public class CommMaster {
 	
 	public static void main(String[] args) throws Exception{
 		CommMaster nxt = new CommMaster();
-		for (int i = 0; i < 10; i++) {
-			nxt.sendData(i);
+		DifferentialPilot pilot = new DifferentialPilot(43.2f, 160f, Motor.A, Motor.B, false);
+		test.main.mainAlgorithm(pilot);
+		grabCan();
+		test.main.mainAlgorithm(pilot);
+		test.LightTest.getOnLine();
+		getInPos();
+		sendReady();
+		
+		if (nxt.dis.readInt() == 1) {
+			releaseCan();
 		}
+		
 		nxt.end();
 	}
 }
