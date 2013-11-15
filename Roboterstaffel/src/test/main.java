@@ -1,6 +1,7 @@
 package test;
 
 import lejos.nxt.Button;
+import lejos.nxt.LightSensor;
 import lejos.nxt.Motor;
 import lejos.nxt.SensorPort;
 import lejos.nxt.Sound;
@@ -11,6 +12,7 @@ import lejos.util.Delay;
 public class main {
 	
 	static final DifferentialPilot pilot = new DifferentialPilot(43.2f, 160f, Motor.A, Motor.B, false);
+	static boolean line = false;
 	
 	//Ich hoffe man kann meine Kommentare verstehen, leider funktioniert der Müll noch nicht so recht...
 	/**
@@ -151,31 +153,32 @@ public class main {
 	}
 	
 	static boolean drive(int distance) {
-		pilot.travel(distance);
-		Thread thread = new Thread() {
-			public void run() {
-				LightMeter.lightSensor(pilot);
+		setLine(false);
+		LightSensor light = new LightSensor(SensorPort.S1);
+		pilot.travel(distance, true);
+		while(pilot.isMoving()) {
+			if (light.getLightValue() > 39) {
+				pilot.stop();
+				System.out.print("     line!!");
+				setLine(true);
 			}
-		};
-		thread.run();
-		while(pilot.isMoving())Thread.yield();
-		LightMeter.stopLoop();
-		return (LightMeter.getSignal());
+			Delay.msDelay(10);			
+		}
+		return getLine();
 	}
 	
 	static boolean rotate(int angle) {
-		pilot.rotate(angle);
-		Thread thread = new Thread() {
-			public void run() {
-				LightMeter.lightSensor(pilot);
+		setLine(false);
+		LightSensor light = new LightSensor(SensorPort.S1);
+		pilot.rotate(angle, true);
+		while(pilot.isMoving()) {
+			if (light.getLightValue() > 39) {
+				pilot.stop();
+				setLine(true);
 			}
-		};
-		thread.run();
-		while(pilot.isMoving())Thread.yield();
-		thread.interrupt();
-		LightMeter.stopLoop();
-		System.out.println("       stopped!!");
-		return (LightMeter.getSignal());
+			Delay.msDelay(10);			
+		}
+		return getLine();
 	}
 	
 	public static void main(String[] args) {
@@ -187,10 +190,9 @@ public class main {
 		}
 		Motor.C.stop();
 		
-
-		
 		pilot.setAcceleration(50); //30 if floor slippery
 		pilot.setRotateSpeed(60);
+		
 		mainAlgorithm(pilot);
 //		Thread lightThread = new Thread() {
 //			lightSensor();
@@ -206,7 +208,8 @@ public class main {
 		int peakDist; //distance to supposed can position
 		
 		while(true){
-			if(LightMeter.getSignal()) {
+			if(getLine()) {
+				System.out.println("       fuck");
 				foundLine();
 			}
 			Thread thread1 = new Thread() {		//thread for complete turn
@@ -252,9 +255,7 @@ public class main {
 				Sound.setVolume(100);
 				Sound.playNote(Sound.FLUTE, 1500, 1000);
 				Sound.playNote(Sound.FLUTE, 1500, 1000);
-				if(drive(450)) {
-					
-				}
+				drive(450);
 				continue;							//start turning and measuring again
 			}
 			peakDist = rotationArray[peakRot];
@@ -264,7 +265,15 @@ public class main {
 		}
 	}
 
-	private static void foundLine() {
+	private static boolean getLine() {
+		return line;
+	}
+	
+	private static void setLine(boolean lineBool) {
+		line = lineBool;
+	}
+
+	public static void foundLine() {
 		pilot.rotate(180);
 		pilot.travel(500);
 	}
