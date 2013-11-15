@@ -1,9 +1,7 @@
 package test;
 
 import lejos.nxt.Button;
-import lejos.nxt.LightSensor;
 import lejos.nxt.Motor;
-import lejos.nxt.MotorPort;
 import lejos.nxt.SensorPort;
 import lejos.nxt.Sound;
 import lejos.nxt.UltrasonicSensor;
@@ -154,15 +152,29 @@ public class main {
 	
 	static boolean drive(int distance) {
 		pilot.travel(distance);
-		LightMeter.lightSensor(pilot);
+		Thread thread = new Thread() {
+			public void run() {
+				LightMeter.lightSensor(pilot);
+			}
+		};
+		thread.run();
 		while(pilot.isMoving())Thread.yield();
+		LightMeter.stopLoop();
 		return (LightMeter.getSignal());
 	}
 	
 	static boolean rotate(int angle) {
 		pilot.rotate(angle);
-		LightMeter.lightSensor(pilot);
+		Thread thread = new Thread() {
+			public void run() {
+				LightMeter.lightSensor(pilot);
+			}
+		};
+		thread.run();
 		while(pilot.isMoving())Thread.yield();
+		thread.interrupt();
+		LightMeter.stopLoop();
+		System.out.println("       stopped!!");
 		return (LightMeter.getSignal());
 	}
 	
@@ -190,19 +202,9 @@ public class main {
 	public static void mainAlgorithm(final DifferentialPilot pilot) {
 		
 		Button.waitForAnyPress();
-//		final DifferentialPilot pilotClaw = new DifferentialPilot(43.2f, 160f, Motor.C, Motor.C, false);
-//		pilotClaw.setAcceleration(20);
-//		pilotClaw.travel(-20);
-//		MotorPort.C.controlMotor(100, 2);
-//		Delay.msDelay(100);
-
-		//MotorPort.C.controlMotor(100, 3);
-		
-		
 		int peakRot;  //rotation direction of supposed can position
 		int peakDist; //distance to supposed can position
-//		Motor.C.setSpeed(8);
-//		Motor.C.backward();
+		
 		while(true){
 			if(LightMeter.getSignal()) {
 				foundLine();
@@ -265,7 +267,6 @@ public class main {
 	private static void foundLine() {
 		pilot.rotate(180);
 		pilot.travel(500);
-		
 	}
 
 	static boolean driveNGrabCan(int peakRot, int peakDist) {

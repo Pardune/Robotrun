@@ -8,20 +8,29 @@ import lejos.util.Delay;
 public class LightMeter {
 
 	static LightSensor light = new LightSensor(SensorPort.S1);
-	static boolean signal = false;
+	static boolean signal;
+	static boolean loop;
 	
-	static boolean getSignal() {
+	public static boolean getSignal() {
 		return signal;
 	}
 	
-	static void lightSensor(final DifferentialPilot pilot) {
-		while(!signal) {
-			if (41 - light.getLightValue() > 3) {
+	public static void stopLoop() {
+		loop = false;
+	}
+	
+	public static void lightSensor(final DifferentialPilot pilot) {
+		signal = false;
+		loop = true;
+		while(loop) {
+			if (40 - light.getLightValue() < 0) {
 				pilot.quickStop();
 				signal = true;
+				System.out.println("         Found Line!!");
+				break;
 			}
 			Delay.msDelay(10);
-		}		
+		}
 	}
 
 }
