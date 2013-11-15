@@ -43,7 +43,7 @@ public class Communications  {
 		// setup end
 		
 		// call functions that do candy
-		pcToSource();
+		//pcToSource();
 		nxtToNxt();
 		end();			// obligatory!
 	}
