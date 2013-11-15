@@ -21,10 +21,8 @@ public class LightTest {
 		dist = new UltrasonicSensor(SensorPort.S4);
 		boolean hasCan;
 		//findWhitePaper();
-		//while (true)
-		//checkLightValue();
 		while (true) {
-			getRawValue();
+			checkLightValue();
 		}
 		
 		//followLine();

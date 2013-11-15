@@ -4,6 +4,7 @@ package pardune;
  * 
  */
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 
 import javax.bluetooth.RemoteDevice;
@@ -11,9 +12,10 @@ import javax.bluetooth.RemoteDevice;
 import lejos.nxt.comm.BTConnection;
 import lejos.nxt.comm.Bluetooth;
 
-public class CommunicationSlaveNXT {
-	// fields for constuctor CommunicationMasterNXT()
+public class CommSlave {
+	// fields for constuctor CommMaster()
 	DataInputStream dis;
+	DataOutputStream dos;
 	BTConnection btc;
 	RemoteDevice btrd;
 	String remoteName = "NXT";
@@ -21,11 +23,11 @@ public class CommunicationSlaveNXT {
 	// fields for sendData()
 	int data;
 
-	public CommunicationSlaveNXT() throws Exception {
+	public CommSlave() throws Exception {
 		// setup for pcToSource()
 		btc = Bluetooth.waitForConnection();
 		dis = btc.openDataInputStream();
-		btc.
+		dos = btc.openDataOutputStream();
 
 		// setup for nxtToNxt()
 		btrd = Bluetooth.getKnownDevice(remoteName);
@@ -39,18 +41,23 @@ public class CommunicationSlaveNXT {
 			System.out.println("Read Exception");
 			return 1;
 		}
-		System.out.println("data: " + data);
+		System.out.println("         data: " + data);
 		return data;
 	}
 
 	public void end() throws Exception{
 		// obligatory
 		dis.close();
+		dos.close();
 		Thread.sleep(100);			// better do this
 	}
 	
 	public static void main(String[] args) throws Exception{
-		new CommunicationSlaveNXT();
+		CommSlave nxt = new CommSlave();
+		for (int i = 0; i < 10; i++) {
+			nxt.recData();
+		}
+		nxt.end();
 	}
 }
 
