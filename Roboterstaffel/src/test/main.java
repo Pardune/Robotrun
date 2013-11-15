@@ -159,8 +159,10 @@ public class main {
 		pilot.travel(distance, true);
 		while(pilot.isMoving()) {
 			if (light.getLightValue() > 39) {
+				pilot.setAcceleration(1000);
 				pilot.stop();
-				System.out.print("     line!!");
+				while(pilot.isMoving()) Thread.yield();
+				pilot.setAcceleration(50);
 				setLine(true);
 			}
 			Delay.msDelay(10);			
@@ -174,7 +176,10 @@ public class main {
 		pilot.rotate(angle, true);
 		while(pilot.isMoving()) {
 			if (light.getLightValue() > 39) {
+				pilot.setAcceleration(1000);
 				pilot.stop();
+				while(pilot.isMoving()) Thread.yield();
+				pilot.setAcceleration(50);
 				setLine(true);
 			}
 			Delay.msDelay(10);			
@@ -306,8 +311,8 @@ public class main {
 		while(true) {
 			int [] rotationArray = rotateNscan();
 			int angle = findMaxDistance(rotationArray);
-			if(rotate(angle * 5)) break;
-			if(drive(450)) break;
+			if(rotate(angle * 5)) return;
+			if(drive(450)) return;
 		}
 	}
 
@@ -336,10 +341,17 @@ public class main {
 			Motor.C.setSpeed(8);
 			Motor.C.rotateTo(25);			//open claw
 			Delay.msDelay(4000);
-			drive((peakDist - 10)*10);	//drive to can stopping 10 cm in front of u.s.sensor
+			drive((peakDist - 6)*10);	//drive to can stopping 10 cm in front of u.s.sensor
 			while(pilot.isMoving())Thread.yield();
 			Motor.C.rotateTo(-25);			//close claw
-			Delay.msDelay(4000);		//wait to ensure claw closure
+			Motor.C.setSpeed(20);
+			Motor.C.setStallThreshold(2, 100);
+			Motor.C.rotateTo(-90);
+			while(!Motor.C.isStalled()){
+				Delay.msDelay(10);
+			}
+			Motor.C.stop();
+//			Delay.msDelay(4000);		//wait to ensure claw closure
 			grabbedCan = true;			//can now grabbed
 			Sound.playNote(Sound.FLUTE, 1500, 1000);
 			System.out.println("         C " + peakDist);
