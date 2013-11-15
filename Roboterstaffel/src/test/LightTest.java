@@ -21,11 +21,11 @@ public class LightTest {
 		dist = new UltrasonicSensor(SensorPort.S4);
 		boolean hasCan;
 		//findWhitePaper();
-		while (true) {
+		/*while (true) {
 			checkLightValue();
-		}
+		}*/
 		
-		//followLine();
+		followLine();
 		//driveOnLine();
 		/*if (isLineLeft()== true ) {
 			Delay.msDelay(2000);
@@ -116,7 +116,7 @@ public class LightTest {
 	}
 	
 	public static void followLine() {
-		int white = 41;	
+		int white = 44;	
 		int angle = 1;	
 		int dir = 1;	
 		int rotDist = 1;
