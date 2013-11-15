@@ -14,6 +14,7 @@ public class LightTest {
 	static DifferentialPilot pilot;
 	static LightSensor light;
 	static UltrasonicSensor dist;
+	static Thread algo;
 
 	public static void main(String[] args) {
 		pilot = new DifferentialPilot(43.2f, 161f, Motor.A, Motor.B, false);
@@ -25,7 +26,8 @@ public class LightTest {
 			checkLightValue();
 		}*/
 		
-		followLine();
+		//followLine();
+		getOnLine();
 		//driveOnLine();
 		/*if (isLineLeft()== true ) {
 			Delay.msDelay(2000);
@@ -67,38 +69,38 @@ public class LightTest {
 		}
 	}
 	
-	public static boolean isLineLeft() { //precondition: line is in front of robot
-		int lightAtStart;
-		int lightLeft;
-		
-		lightAtStart = light.getLightValue();
-		System.out.println("            " + lightAtStart);
-		Delay.msDelay(500);
-		pilot.rotate(-45);
-		lightLeft = light.getLightValue();
-		System.out.println("            " + lightLeft);
-		Delay.msDelay(500);
-		pilot.rotate(45);
-		
-		
-		if (Math.abs(lightLeft - lightAtStart) > 2) return false;
-		else return true;
-	}
-	
-	public static boolean isLineRight() { //precondition: line is in front of roboter
+	public static boolean isLineRight() { //precondition: line is in front of robot
 		int lightAtStart;
 		int lightRight;
 		
 		lightAtStart = light.getLightValue();
 		System.out.println("            " + lightAtStart);
 		Delay.msDelay(500);
-		pilot.rotate(45);
+		pilot.rotate(-45);
 		lightRight = light.getLightValue();
 		System.out.println("            " + lightRight);
 		Delay.msDelay(500);
+		pilot.rotate(45);
+		
+		
+		if (Math.abs(lightRight - lightAtStart) > 3) return false;
+		else return true;
+	}
+	
+	public static boolean isLineLeft() { //precondition: line is in front of roboter
+		int lightAtStart;
+		int lightLeft;
+		
+		lightAtStart = light.getLightValue();
+		System.out.println("            " + lightAtStart);
+		Delay.msDelay(500);
+		pilot.rotate(45);
+		lightLeft = light.getLightValue();
+		System.out.println("            " + lightLeft);
+		Delay.msDelay(500);
 		pilot.rotate(-45);
 
-		if (Math.abs(lightRight - lightAtStart) < 2) return true;
+		if (Math.abs(lightLeft - lightAtStart) < 3) return true;
 		else return false;
 	}
 	
@@ -117,10 +119,11 @@ public class LightTest {
 	
 	public static void followLine() {
 		int white = 44;	
-		int angle = 1;	
+		int angle = 3;	
 		int dir = 1;	
 		int rotDist = 1;
 		int wert;
+		pilot.setTravelSpeed(50);
 		
 		while (true) {
 			wert = light.getLightValue(); 				
@@ -146,4 +149,52 @@ public class LightTest {
 
 	}
 
+	public static void getOnLine() {
+		pilot.setTravelSpeed(50);
+		pilot.forward();
+		Thread testLight = new Thread() {
+			public void run() {
+				while (true) {
+					if (light.getLightValue() > 42) {
+						algo.interrupt();
+						handleLine();
+						return;
+					}
+				}
+			}
+		};
+		testLight.start();
+		
+		algo = new Thread() {
+			public void run() {
+				while (true) {
+					
+				}
+			}
+		};
+		algo.start();
+	}
+	
+	public static void handleLine() {
+		boolean left = isLineLeft();
+		boolean right = isLineRight();
+		if (left && right) {
+			pilot.travel(30);
+			pilot.rotate(90);
+			followLine();
+		}
+		else if (left) {
+			pilot.travel(30);
+			pilot.rotate(120);
+			followLine();
+		}
+		else if (right) {
+			pilot.travel(30);
+			pilot.rotate(30);
+			followLine();
+		}
+		else {
+			followLine();
+		}
+	}
 }
