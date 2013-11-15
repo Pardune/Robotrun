@@ -1,7 +1,9 @@
 package test;
 
 import lejos.nxt.Button;
+import lejos.nxt.LightSensor;
 import lejos.nxt.Motor;
+import lejos.nxt.MotorPort;
 import lejos.nxt.SensorPort;
 import lejos.nxt.Sound;
 import lejos.nxt.UltrasonicSensor;
@@ -9,6 +11,8 @@ import lejos.robotics.navigation.DifferentialPilot;
 import lejos.util.Delay;
 
 public class main {
+	
+	static final DifferentialPilot pilot = new DifferentialPilot(43.2f, 160f, Motor.A, Motor.B, false);
 	
 	//Ich hoffe man kann meine Kommentare verstehen, leider funktioniert der Müll noch nicht so recht...
 	/**
@@ -65,6 +69,63 @@ public class main {
 			
 			i = sortArray[c]; //get rotationArray index in order of c
 			
+			if(rotationArray[i]>70) continue; 			// don't choose peak that's further away than 80 cm
+			
+			//###
+			
+			boolean foundLeftJump = false;
+			boolean foundRightJump = false;
+			
+			if(rotationArray[i]>50) {
+				for(int k = -5+i; k < i; k++) {
+					if(rotationArray[(k+72)%72] - rotationArray[(k+73)%72] > 20) {
+						foundLeftJump = true;
+						break;
+					}
+				}
+				for(int k = i; k < 5+i; k++) {
+					if(rotationArray[k+1] - rotationArray[k] > 20) {
+						foundRightJump = true;
+						break;
+					}
+				}
+			}
+			else if(rotationArray[i]>30) {
+				for(int k = -7+i; k < i; k++) {
+					if(rotationArray[(k+72)%72] - rotationArray[(k+73)%72] > 20) {
+						foundLeftJump = true;
+						break;
+					}
+				}
+				for(int k = i; k < 7+i; k++) {
+					if(rotationArray[k+1] - rotationArray[k] > 20) {
+						foundRightJump = true;
+						break;
+					}
+				}
+			} else {
+				for(int k = -8+i; k < i; k++) {
+					if(rotationArray[(k+72)%72] - rotationArray[(k+73)%72] > 20) {
+						foundLeftJump = true;
+						break;
+					}
+				}
+				for(int k = i; k < 8+i; k++) {
+					if(rotationArray[k+1] - rotationArray[k] > 20) {
+						foundRightJump = true;
+						break;
+					}
+				}
+			}
+			
+			if(foundLeftJump && foundRightJump) {
+				peak = i;
+				break;
+			}
+			
+			
+			
+			
 			//if(rotationArray[i+2]<13) { //small distance -> pedestal at least 3 times in array
 //				if (rotationArray[i]+15 < rotationArray[i+2] && rotationArray[i+1]+15 < rotationArray[i+2]
 //						&& rotationArray[i+2] <= rotationArray[i+3] && rotationArray[i+3] >= rotationArray[i+4]
@@ -73,46 +134,97 @@ public class main {
 //					break;
 //				}
 			//}
-			if(rotationArray[i]>80) continue; 			// don't choose peak that's further away than 80 cm
+
 			
-			int extender = 0;			//Array ends at 0 -> for case 0 and 1:
-			if(i==0) extender = 72;		//use these if "exceptions"				because [i-1] && [i-2] would cause errors
-			if(i==1) extender = 70;
-				
+		
+//			int currentCenter = (int) ((rotationArray[i-1 + extender] + rotationArray[i] + rotationArray[i+1])/3);
+//			if (rotationArray[i-2 +extender]+15 > currentCenter && currentCenter < rotationArray[i+2]+15) {
+//				peak = i;
+//				break;
+//			}
 			
-			int currentCenter = (int) ((rotationArray[i-1 + extender] + rotationArray[i] + rotationArray[i+1])/3);
-			if (rotationArray[i-2 +extender]+15 < currentCenter && currentCenter > rotationArray[i+2]+15) {
-				peak = i;
-				break;
-			}
+//			if (rotationArray[i-2 %72]+20 > rotationArray[i] && rotationArray[i-1 %72] > rotationArray[i]
+//					&& rotationArray[i] < rotationArray[i+1] && rotationArray[i] < rotationArray[i+2]+20) {
+//				peak = i;
+//				break;
+//			}
 		}
 		return peak;
-	}	
-		
+	}
+	
+	static boolean drive(int distance) {
+		pilot.travel(distance);
+		LightMeter.lightSensor(pilot);
+		while(pilot.isMoving())Thread.yield();
+		return (LightMeter.getSignal());
+	}
+	
+	static boolean rotate(int angle) {
+		pilot.rotate(angle);
+		LightMeter.lightSensor(pilot);
+		while(pilot.isMoving())Thread.yield();
+		return (LightMeter.getSignal());
+	}
 	
 	public static void main(String[] args) {
+		Motor.C.setSpeed(20);
+		Motor.C.setStallThreshold(2, 100);
+		Motor.C.rotateTo(-90);
+		while(!Motor.C.isStalled()){
+			Delay.msDelay(10);
+		}
+		Motor.C.stop();
+		
+
+		
+		pilot.setAcceleration(50); //30 if floor slippery
+		pilot.setRotateSpeed(60);
+		mainAlgorithm(pilot);
+//		Thread lightThread = new Thread() {
+//			lightSensor();
+//		};
+		
+	}
+		
+	
+	public static void mainAlgorithm(final DifferentialPilot pilot) {
 		
 		Button.waitForAnyPress();
+//		final DifferentialPilot pilotClaw = new DifferentialPilot(43.2f, 160f, Motor.C, Motor.C, false);
+//		pilotClaw.setAcceleration(20);
+//		pilotClaw.travel(-20);
+//		MotorPort.C.controlMotor(100, 2);
+//		Delay.msDelay(100);
+
+		//MotorPort.C.controlMotor(100, 3);
 		
-		final DifferentialPilot pilot = new DifferentialPilot(43.2f, 161f, Motor.A, Motor.B, false); //161f if floor slippery
-		pilot.setAcceleration(20); //30 if floor slippery
+		
 		int peakRot;  //rotation direction of supposed can position
 		int peakDist; //distance to supposed can position
+//		Motor.C.setSpeed(8);
+//		Motor.C.backward();
 		while(true){
+			if(LightMeter.getSignal()) {
+				foundLine();
+			}
 			Thread thread1 = new Thread() {		//thread for complete turn
 				public void run() {
 					pilot.rotate(360);
 				}
 			};
 			thread1.start();
-				UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
-				int[] rotationArray = new int[80];
+			
+			UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
+				int[] rotationArray = new int[81];
 
 				for(int rotation = 0; rotation < 72; rotation++ ) {
 					while (rotation*5 > pilot.getAngleIncrement()) { //every 5°
-						Delay.msDelay(10);
+						Delay.msDelay(1);
 					}
 					rotationArray[rotation]=us.getDistance();		 //save distance
+//					Sound.playNote(Sound.FLUTE, 3000 - (20*rotationArray[rotation]), 10);
+					System.out.println("          " + rotationArray[rotation]);
+			
 				}
 			
 			rotationArray[72]=rotationArray[0];		//let measurements overlap
@@ -121,59 +233,75 @@ public class main {
 			rotationArray[75]=rotationArray[3];
 			rotationArray[76]=rotationArray[4];
 			rotationArray[77]=rotationArray[5];
+			rotationArray[78]=rotationArray[6]; 
+			rotationArray[79]=rotationArray[7];
+			rotationArray[80]=rotationArray[8];
 			
 			peakRot = findPeak(rotationArray);
 			
 			if(peakRot == -1000) {					//no peak found
-				rotationArray[78]=rotationArray[6]; //findMaxDistance needs more overlapping distances
-				rotationArray[79]=rotationArray[7];
+
 				
-				int rotate = findMaxDistance(rotationArray)*5;
-				pilot.rotate(rotate);
+				int rotation = findMaxDistance(rotationArray)*5;
+				if(rotate(rotation)) {
+					pilot.rotate(-pilot.getAngleIncrement());
+					continue;
+				}
 				Sound.setVolume(100);
 				Sound.playNote(Sound.FLUTE, 1500, 1000);
 				Sound.playNote(Sound.FLUTE, 1500, 1000);
-				while(pilot.isMoving())Thread.yield(); //wait till DifPilot has finished all tasks
-				pilot.travel(300);
-				while(pilot.isMoving())Thread.yield();
+				if(drive(450)) {
+					
+				}
 				continue;							//start turning and measuring again
 			}
 			peakDist = rotationArray[peakRot];
-			if(driveNGrabCan(pilot, peakRot, peakDist)) { //true when can found and grabbed
+			if(driveNGrabCan(peakRot, peakDist)) { //true when can found and grabbed
 				break; 									  //stop for now -> for complete program add function here
 			}
 		}
 	}
 
-	static boolean driveNGrabCan(DifferentialPilot pilot, int peakRot, int peakDist) {
+	private static void foundLine() {
+		pilot.rotate(180);
+		pilot.travel(500);
+		
+	}
+
+	static boolean driveNGrabCan(int peakRot, int peakDist) {
 
 		boolean grabbedCan = false;
 
-		Sound.setVolume(100);
+		Sound.setVolume(80);
 		if(peakRot >= 36) peakRot = peakRot - 72;	//turn max 180° 
-		pilot.rotate(peakRot*5);					//convert to degree and rotate
-		while(pilot.isMoving())Thread.yield();
+		if(rotate(peakRot*5)){ //convert to degree and rotate
+			pilot.rotate(-pilot.getAngleIncrement());
+			return false;
+		};					
 		
 		if(peakDist > 25) {
-			pilot.travel(120);
+			if(drive(100))return false;
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
+			System.out.println("         A " + peakDist);
 		} else if(peakDist > 20){
-			pilot.travel(30);
+			if(drive(50))return false;
 			Sound.playNote(Sound.FLUTE, 1000, 1000);
+			System.out.println("         B " + peakDist);
 		} else {						//can near enough to be grabbed
+			
 			Motor.C.setSpeed(8);
-			Motor.C.forward();			//open claw
+			Motor.C.rotateTo(25);			//open claw
 			Delay.msDelay(4000);
-			pilot.travel((peakDist - 7)*10);	//drive to can stopping 7 cm in front of u.s.sensor
+			drive((peakDist - 10)*10);	//drive to can stopping 10 cm in front of u.s.sensor
 			while(pilot.isMoving())Thread.yield();
-			Motor.C.backward();			//close claw
+			Motor.C.rotateTo(-25);			//close claw
 			Delay.msDelay(4000);		//wait to ensure claw closure
 			grabbedCan = true;			//can now grabbed
 			Sound.playNote(Sound.FLUTE, 1500, 1000);
+			System.out.println("         C " + peakDist);
 		}
 		while(pilot.isMoving())Thread.yield();
-		Delay.msDelay(2000);
 		return grabbedCan;
 		
 	}
