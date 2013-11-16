@@ -1,6 +1,7 @@
 package test;
 
 import pardune.CommMaster;
+import pardune.CommSlave;
 import lejos.nxt.Button;
 import lejos.nxt.LightSensor;
 import lejos.nxt.Motor;
@@ -10,7 +11,7 @@ import lejos.nxt.UltrasonicSensor;
 import lejos.robotics.navigation.DifferentialPilot;
 import lejos.util.Delay;
 
-public class main {
+public class Main {
 	
 	static final DifferentialPilot pilot = new DifferentialPilot(43.2f, 160f, Motor.A, Motor.B, false);
 	static boolean line = false;
@@ -158,7 +159,7 @@ public class main {
 		LightSensor light = new LightSensor(SensorPort.S1);
 		pilot.travel(distance, true);
 		while(pilot.isMoving()) {
-			if (light.getLightValue() > 39) {
+			if (light.getLightValue() > LightTest.line) {
 				pilot.setAcceleration(1000);
 				pilot.stop();
 				while(pilot.isMoving()) Thread.yield();
@@ -175,7 +176,7 @@ public class main {
 		LightSensor light = new LightSensor(SensorPort.S1);
 		pilot.rotate(angle, true);
 		while(pilot.isMoving()) {
-			if (light.getLightValue() > 39) {
+			if (light.getLightValue() > LightTest.line) {
 				pilot.setAcceleration(1000);
 				pilot.stop();
 				while(pilot.isMoving()) Thread.yield();
@@ -186,54 +187,66 @@ public class main {
 		}
 		return getLine();
 	}
-	
-	public static void main(String[] args) {
+
+	public static void liftClaw() {
 		Motor.C.setSpeed(20);
 		Motor.C.setStallThreshold(2, 100);
 		Motor.C.rotateTo(-90);
+		while(!Motor.C.isStalled()) {
+			Delay.msDelay(10);
+		}
+		Motor.C.stop();
+	}
+	
+	public static void main(String[] args) {
+		Delay.msDelay(10000);
+		pilot.setAcceleration(50); //30 if floor slippery
+		pilot.setRotateSpeed(60);
+		Button.waitForAnyPress();
+		LightTest.setLineValue();
+		CommMaster nxt = new CommMaster();
+		while (true) {
+			liftClaw();
+			mainAlgorithm(pilot); //searching pedestal and grabbing the can, then drive to the line
+			LightTest.handleLine(true);
+			turnOfUltrasonic();
+			nxt.sendReady();
+			nxt.waitForAnswer();
+			releaseCan();
+			returnToField();
+			nxt.waitForAnswer();
+		}		
+	}
+	
+	public static void turnOfUltrasonic() {
+		UltrasonicSensor ultra = new UltrasonicSensor(SensorPort.S4);
+		ultra.off();
+	}
+	
+	public static void returnToField() {
+		Delay.msDelay(10000);
+		pilot.rotate(-90);
+		pilot.travel(100);
+	}
+	
+	private static void releaseCan() {
+		Motor.C.setSpeed(20);
+		Motor.C.setStallThreshold(2, 100);
+		Motor.C.rotateTo(90);
 		while(!Motor.C.isStalled()){
 			Delay.msDelay(10);
 		}
 		Motor.C.stop();
-		
-		pilot.setAcceleration(50); //30 if floor slippery
-		pilot.setRotateSpeed(60);
-		
-		mainAlgorithm(pilot);
-//		Thread lightThread = new Thread() {
-//			lightSensor();
-//		};
-		
-		
-		//main method for robot 1
-		CommMaster nxt = new CommMaster();
-
-		DifferentialPilot pilot = new DifferentialPilot(43.2f, 160f, Motor.A, Motor.B, false);
-		test.main.mainAlgorithm(pilot);
-		test.LightTest.getOnLine();
-		
-		
-//		getInPos();
-//		sendReady();
-//		
-//		if (nxt.dis.readInt() == 1) {
-//			releaseCan();
-//		}
-//		
-//		nxt.end();
-		
 	}
-		
-	
+
 	public static void mainAlgorithm(final DifferentialPilot pilot) {
-		
-		Button.waitForAnyPress();
+
 		int peakRot;  //rotation direction of supposed can position
 		int peakDist; //distance to supposed can position
 		
 		while(true){
 			if(getLine()) {
-				foundLine();
+				avoidLine();
 			}
 			int[] rotationArray = rotateNscan();
 			
@@ -256,7 +269,7 @@ public class main {
 			peakDist = rotationArray[peakRot];
 			if(driveNGrabCan(peakRot, peakDist)) { //true when can found and grabbed
 				findLine();
-				break; 									  //stop for now -> for complete program add function here
+				return; 									  //stop for now -> for complete program add function here
 			}
 		}
 	}
@@ -302,7 +315,7 @@ public class main {
 		line = lineBool;
 	}
 
-	public static void foundLine() {
+	public static void avoidLine() {
 		pilot.rotate(180);
 		pilot.travel(500);
 	}
@@ -327,22 +340,21 @@ public class main {
 			return false;
 		};					
 		
-		if(peakDist > 25) {
+		if(peakDist > 27) {
 			if(drive(100))return false;
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			System.out.println("         A " + peakDist);
-		} else if(peakDist > 20){
+		} else if(peakDist > 22){
 			if(drive(50))return false;
 			Sound.playNote(Sound.FLUTE, 1000, 1000);
 			System.out.println("         B " + peakDist);
 		} else {						//can near enough to be grabbed
 			
 			Motor.C.setSpeed(8);
-			Motor.C.rotateTo(25);			//open claw
+			Motor.C.rotateTo(30);			//open claw
 			Delay.msDelay(4000);
 			drive((peakDist - 6)*10);	//drive to can stopping 10 cm in front of u.s.sensor
-			while(pilot.isMoving())Thread.yield();
 			Motor.C.rotateTo(-25);			//close claw
 			Motor.C.setSpeed(20);
 			Motor.C.setStallThreshold(2, 100);

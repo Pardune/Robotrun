@@ -38,16 +38,26 @@ public class CommSlave {
 			e.printStackTrace();
 		}
 	}
-
-	public int recData(){
+	
+	public void waitForAnswer() {
 		try {
-			data = dis.readInt();		// input stream data is stored in a variable
-		} catch (IOException ioe){
-			System.out.println("Read Exception");
-			return 1;
+			while (dis.readInt() != 1) {
+				
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		System.out.println("         data: " + data);
-		return data;
+	}
+	
+	public void sendReady() {
+		try {
+			dos.writeInt(1);
+			dos.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void end() throws Exception{
@@ -55,18 +65,6 @@ public class CommSlave {
 		dis.close();
 		dos.close();
 		Thread.sleep(100);			// better do this
-	}
-	
-	public static void main(String[] args) throws Exception{
-		CommSlave nxt = new CommSlave();
-		if (nxt.dis.readInt() == 1) {
-			searchLine();
-			getOnLine();
-			handover();
-			mainAlgo();
-			releaseCan();
-		}
-		nxt.end();
 	}
 }
 

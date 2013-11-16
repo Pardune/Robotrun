@@ -47,6 +47,27 @@ public class CommMaster {
 		}
 	}
 	
+	public void waitForAnswer() {
+		try {
+			while (dis.readInt() != 1) {
+				
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void sendReady() {
+		try {
+			dos.writeInt(1);
+			dos.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public int sendData(int data){
 		try {
 			dos.writeInt(data);
@@ -59,27 +80,18 @@ public class CommMaster {
 		return 0;
 	}
 	
-	public void end() throws Exception{
-		// obligatory
-		dis.close();
-		dos.close();
-		Thread.sleep(100);			// better do this
-	}
-	
-	public static void main(String[] args) throws Exception{
-		CommMaster nxt = new CommMaster();
-		DifferentialPilot pilot = new DifferentialPilot(43.2f, 160f, Motor.A, Motor.B, false);
-		test.main.mainAlgorithm(pilot);
-		grabCan();
-		test.main.mainAlgorithm(pilot);
-		test.LightTest.getOnLine();
-		getInPos();
-		sendReady();
-		
-		if (nxt.dis.readInt() == 1) {
-			releaseCan();
+	public void end() {
+		try {
+			// obligatory
+			dis.close();
+			dos.close();
+			Thread.sleep(100);			// better do this
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		
-		nxt.end();
 	}
 }

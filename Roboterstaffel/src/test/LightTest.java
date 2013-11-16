@@ -11,23 +11,22 @@ import lejos.robotics.navigation.DifferentialPilot;
 import lejos.util.Delay;
 
 public class LightTest {
-	static DifferentialPilot pilot;
-	static LightSensor light;
-	static UltrasonicSensor dist;
-	static Thread algo;
-
+	static DifferentialPilot pilot = new DifferentialPilot(43.2f, 161f, Motor.A, Motor.B, false);
+	static LightSensor light = new LightSensor(SensorPort.S1);
+	static UltrasonicSensor dist = new UltrasonicSensor(SensorPort.S4);
+	
+	static int floor;
+	static int line;
+	
 	public static void main(String[] args) {
-		pilot = new DifferentialPilot(43.2f, 161f, Motor.A, Motor.B, false);
-		light = new LightSensor(SensorPort.S1);
-		dist = new UltrasonicSensor(SensorPort.S4);
+		
 		boolean hasCan;
 		//findWhitePaper();
-		/*while (true) {
+		while (true) {
 			checkLightValue();
-		}*/
-		
+		}
 		//followLine();
-		getOnLine();
+		//getOnLine();
 		//driveOnLine();
 		/*if (isLineLeft()== true ) {
 			Delay.msDelay(2000);
@@ -41,6 +40,14 @@ public class LightTest {
 			Sound.beep();
 		}*/
 		//Delay.msDelay(1000);
+	}
+	
+	public static void setLineValue(){
+		
+		floor = light.getLightValue();
+		floor = light.getLightValue();
+		floor = light.getLightValue();
+		line = floor + 5;
 	}
 	
 	public static void getRawValue() {
@@ -65,6 +72,7 @@ public class LightTest {
 			}
 			if (dist.getDistance() < 50) {
 				pilot.rotate(180);
+				return;
 			}
 		}
 	}
@@ -117,8 +125,9 @@ public class LightTest {
 		Delay.msDelay(1000);
 	}
 	
-	public static void followLine() {
-		int white = 44;	
+	public static void followLine(boolean turnAtEnd) {
+		
+		
 		int angle = 3;	
 		int dir = 1;	
 		int rotDist = 1;
@@ -127,22 +136,23 @@ public class LightTest {
 		
 		while (true) {
 			wert = light.getLightValue(); 				
-			if (white - wert > 3) {
+			if (line - wert > 1) {					//line lost
 				pilot.stop();	
-				while(white - wert > 3) {	
+				while(line - wert > 1) {			//trying to find line with increasing angles
 					pilot.rotate(angle*dir*rotDist);	
 					dir *= -1;			
 					rotDist += 2;				
 					wert = light.getLightValue();
 				}
 			}
-			else {
+			else {							//line still found
 				pilot.forward();				
 				rotDist = 1;					
 				
-				if (dist.getDistance() < 30) {
+				if (dist.getDistance() < 20) { //wall found, going into position and return
 					pilot.stop();
-					pilot.rotate(180);
+					if (turnAtEnd) pilot.rotate(180);
+					return;
 				}
 			}
 		}
@@ -151,50 +161,42 @@ public class LightTest {
 
 	public static void getOnLine() {
 		pilot.setTravelSpeed(50);
-		pilot.forward();
+		pilot.travel(1000,true);
+
 		Thread testLight = new Thread() {
 			public void run() {
 				while (true) {
-					if (light.getLightValue() > 42) {
-						algo.interrupt();
-						handleLine();
+					if (light.getLightValue() > line) {
+						pilot.stop();
+						handleLine(false);
 						return;
 					}
 				}
 			}
 		};
 		testLight.start();
-		
-		algo = new Thread() {
-			public void run() {
-				while (true) {
-					
-				}
-			}
-		};
-		algo.start();
 	}
 	
-	public static void handleLine() {
+	public static void handleLine(boolean turn) {
 		boolean left = isLineLeft();
 		boolean right = isLineRight();
 		if (left && right) {
 			pilot.travel(30);
 			pilot.rotate(90);
-			followLine();
+			followLine(turn);
 		}
 		else if (left) {
 			pilot.travel(30);
 			pilot.rotate(120);
-			followLine();
+			followLine(turn);
 		}
 		else if (right) {
 			pilot.travel(30);
 			pilot.rotate(30);
-			followLine();
+			followLine(turn);
 		}
 		else {
-			followLine();
+			followLine(turn);
 		}
 	}
 }
