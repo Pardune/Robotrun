@@ -366,7 +366,7 @@ public class Main {
 		} else {						//can near enough to be grabbed
 			
 			Motor.C.setSpeed(8);
-			Motor.C.rotateTo(30);			//open claw
+			Motor.C.rotateTo(50);			//open claw
 			Delay.msDelay(4000);
 			drive(Math.abs((peakDist - 4)*10));	//drive to can stopping 10 cm in front of u.s.sensor
 			Motor.C.rotateTo(-25);			//close claw

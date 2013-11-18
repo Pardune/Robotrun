@@ -155,7 +155,7 @@ public class LightTest {
 						return;
 					}
 				} else {
-					if (dist.getDistance() < 5) { //wall found, going into position and return
+					if (dist.getDistance() < 21) { //wall found, going into position and return
 						pilot.stop();
 						return;
 					}

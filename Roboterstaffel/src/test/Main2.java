@@ -223,15 +223,11 @@ for(int c = 0; c < 72; c++) {
 			returnToField();
 			mainAlgorithm(pilot);
 			nxt.sendReady();
-			nxt.waitForAnswer();
-			LightTest.followLine(false);
-			releaseCan();
-			nxt.waitForAnswer();
 		}		
 	}
 	public static void grabCan() {
 		Motor.C.setSpeed(8);
-		Motor.C.rotateTo(30);			//open claw
+		Motor.C.rotateTo(50);			//open claw
 		Delay.msDelay(4000);
 		LightTest.followLine(false);
 		pilot.travel(150);
@@ -388,7 +384,7 @@ for(int c = 0; c < 72; c++) {
 			Motor.C.setSpeed(8);
 			Delay.msDelay(4000);
 			drive((peakDist - 6)*10);	//drive to can stopping 10 cm in front of u.s.sensor
-			Motor.C.rotateTo(30);			//open claw
+			Motor.C.rotateTo(50);			//open claw
 			drive(-100);
 			Motor.C.rotateTo(-25);			//close claw
 			Motor.C.setSpeed(20);
