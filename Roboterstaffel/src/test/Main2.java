@@ -221,10 +221,10 @@ for(int c = 0; c < 72; c++) {
 			grabCan();
 			nxt.sendReady();
 			returnToField();
-			mainAlgorithm(pilot); 
-			LightTest.followLine(false);
+			mainAlgorithm(pilot);
 			nxt.sendReady();
 			nxt.waitForAnswer();
+			LightTest.followLine(false);
 			releaseCan();
 			nxt.waitForAnswer();
 		}		
@@ -382,7 +382,7 @@ for(int c = 0; c < 72; c++) {
 		} else if(peakDist > 20){
 			Sound.playNote(Sound.FLUTE, 1000, 1000);
 			System.out.println("         B " + peakDist);
-			if(drive(50))return false;
+			if(drive(peakDist - 15))return false;
 		} else {						//can near enough to be grabbed
 			
 			Motor.C.setSpeed(8);
