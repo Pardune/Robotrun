@@ -296,7 +296,7 @@ for(int c = 0; c < 72; c++) {
 				} else if(rotationArray[angle]>50) {
 					drive(300);
 				} else {
-				drive((rotationArray[angle]-15)*10);
+					drive((rotationArray[angle]-15)*10);
 				}
 				continue;							//start turning and measuring again
 			}
@@ -402,7 +402,7 @@ for(int c = 0; c < 72; c++) {
 		} else if(peakDist > 20){
 			Sound.playNote(Sound.FLUTE, 1000, 1000);
 			System.out.println("         B " + peakDist);
-			if(drive(peakDist - 15))return false;
+			if(drive((peakDist - 15)*10))return false;
 		} else {						//can near enough to be grabbed
 			
 			Motor.C.setSpeed(8);
