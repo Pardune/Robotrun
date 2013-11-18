@@ -1,12 +1,9 @@
 package test;
 
-import lejos.nxt.Button;
 import lejos.nxt.LightSensor;
 import lejos.nxt.Motor;
 import lejos.nxt.SensorPort;
-import lejos.nxt.Sound;
 import lejos.nxt.UltrasonicSensor;
-import lejos.robotics.LightDetector;
 import lejos.robotics.navigation.DifferentialPilot;
 import lejos.util.Delay;
 
@@ -20,7 +17,6 @@ public class LightTest {
 	
 	public static void main(String[] args) {
 		
-		boolean hasCan;
 		//findWhitePaper();
 		while (true) {
 			checkLightValue();
@@ -59,7 +55,7 @@ public class LightTest {
 		Delay.msDelay(1000);
 	}
 	
-	public static void driveOnLine (){ //precondition: robot is in the line
+	/*public static void driveOnLine (){ //precondition: robot is in the line
 		while (true) {
 			boolean lineOnLeft = isLineLeft();
 			boolean lineOnRight = isLineRight();
@@ -79,7 +75,7 @@ public class LightTest {
 				return;
 			}
 		}
-	}
+	}*/
 	
 	public static boolean isLineRight() { //precondition: line is in front of robot
 		int lightAtStart;
@@ -116,14 +112,6 @@ public class LightTest {
 		else return false;
 	}
 	
-	public static void findWhitePaper() {
-		pilot.travel(300);
-		int first = light.getNormalizedLightValue();
-		pilot.travel(300);
-		int two = light.getNormalizedLightValue();
-		if (two > first) pilot.travel(-300);
-	}
-	
 	public static void checkLightValue() {
 		System.out.println("          " + light.getLightValue());
 		Delay.msDelay(1000);
@@ -131,7 +119,7 @@ public class LightTest {
 	
 	public static void followLine(boolean turnAtEnd) {
 		
-		
+		pilot.setAcceleration(1000);
 		int angle = 3;	
 		int dir = 1;	
 		int rotDist = 1;
@@ -155,11 +143,13 @@ public class LightTest {
 					if (dist.getDistance() < 20) { //wall found, going into position and return
 						pilot.stop();
 						pilot.rotate(180);
+						pilot.setAcceleration(60);
 						return;
 					}
 				} else {
 					if (dist.getDistance() < 21) { //wall found, going into position and return
 						pilot.stop();
+						pilot.setAcceleration(60);
 						return;
 					}
 				}	
@@ -175,7 +165,9 @@ public class LightTest {
 			public void run() {
 				while (true) {
 					if (light.getLightValue() > line) {
+						pilot.setAcceleration(1000);
 						pilot.stop();
+						pilot.setAcceleration(60);
 						handleLine(false);
 						return;
 					}

@@ -342,7 +342,7 @@ public class Main {
 	
 	public static void findLine() {
 		while(true) {
-			int [] rotationArray = rotateNscan();
+			int[] rotationArray = rotateNscan();
 			int angle = findMaxDistance(rotationArray);
 			int optimAngle;
 			
