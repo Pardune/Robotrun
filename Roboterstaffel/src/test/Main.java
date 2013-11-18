@@ -10,6 +10,7 @@ import lejos.nxt.Sound;
 import lejos.nxt.UltrasonicSensor;
 import lejos.robotics.navigation.DifferentialPilot;
 import lejos.util.Delay;
+import java.lang.Math;
 
 public class Main {
 	
@@ -80,12 +81,14 @@ public class Main {
 			
 			if(rotationArray[i]>50) {
 				for(int k = -5+i; k < i; k++) {
+					if(rotationArray[(k+72)%72] >230 || rotationArray[(k+73)%72] >230 ) continue;
 					if(rotationArray[(k+72)%72] - rotationArray[(k+73)%72] > 20) {
 						foundLeftJump = true;
 						break;
 					}
 				}
 				for(int k = i; k < 5+i; k++) {
+					if(rotationArray[(k+72)%72] >230 || rotationArray[(k+73)%72] >230 ) continue;
 					if(rotationArray[k+1] - rotationArray[k] > 20) {
 						foundRightJump = true;
 						break;
@@ -94,12 +97,14 @@ public class Main {
 			}
 			else if(rotationArray[i]>30) {
 				for(int k = -7+i; k < i; k++) {
+					if(rotationArray[(k+72)%72] >230 || rotationArray[(k+73)%72] >230 ) continue;
 					if(rotationArray[(k+72)%72] - rotationArray[(k+73)%72] > 20) {
 						foundLeftJump = true;
 						break;
 					}
 				}
 				for(int k = i; k < 7+i; k++) {
+					if(rotationArray[(k+72)%72] >230 || rotationArray[(k+73)%72] >230 ) continue;
 					if(rotationArray[k+1] - rotationArray[k] > 20) {
 						foundRightJump = true;
 						break;
@@ -107,12 +112,14 @@ public class Main {
 				}
 			} else {
 				for(int k = -8+i; k < i; k++) {
+					if(rotationArray[(k+72)%72] >230 || rotationArray[(k+73)%72] >230 ) continue;
 					if(rotationArray[(k+72)%72] - rotationArray[(k+73)%72] > 20) {
 						foundLeftJump = true;
 						break;
 					}
 				}
 				for(int k = i; k < 8+i; k++) {
+					if(rotationArray[(k+72)%72] >230 || rotationArray[(k+73)%72] >230 ) continue;
 					if(rotationArray[k+1] - rotationArray[k] > 20) {
 						foundRightJump = true;
 						break;
@@ -340,21 +347,28 @@ public class Main {
 			return false;
 		};					
 		
-		if(peakDist > 27) {
-			if(drive(100))return false;
+		if(peakDist > 82) {
+
+			Sound.playNote(Sound.FLUTE, 300, 1000);
+			System.out.println("         A " + peakDist);
+			if(drive(300))return false;
+		}
+		else if(peakDist > 45) {
+
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			System.out.println("         A " + peakDist);
-		} else if(peakDist > 22){
-			if(drive(50))return false;
+			if(drive((peakDist-20)*10))return false;
+		} else if(peakDist > 20){
 			Sound.playNote(Sound.FLUTE, 1000, 1000);
 			System.out.println("         B " + peakDist);
+			if(drive(50))return false;
 		} else {						//can near enough to be grabbed
 			
 			Motor.C.setSpeed(8);
 			Motor.C.rotateTo(30);			//open claw
 			Delay.msDelay(4000);
-			drive((peakDist - 6)*10);	//drive to can stopping 10 cm in front of u.s.sensor
+			drive(Math.abs((peakDist - 4)*10));	//drive to can stopping 10 cm in front of u.s.sensor
 			Motor.C.rotateTo(-25);			//close claw
 			Motor.C.setSpeed(20);
 			Motor.C.setStallThreshold(2, 100);
