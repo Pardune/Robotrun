@@ -218,8 +218,8 @@ for(int c = 0; c < 72; c++) {
 			
 			findLine();
 			LightTest.handleLine(true);
-			nxt.sendReady();
 			grabCan();
+			nxt.sendReady();
 			returnToField();
 			mainAlgorithm(pilot); 
 			LightTest.followLine(false);
@@ -230,8 +230,19 @@ for(int c = 0; c < 72; c++) {
 		}		
 	}
 	public static void grabCan() {
+		Motor.C.setSpeed(8);
+		Motor.C.rotateTo(30);			//open claw
+		Delay.msDelay(4000);
 		LightTest.followLine(false);
 		pilot.travel(150);
+		Motor.C.rotateTo(-25);			//close claw
+		Motor.C.setSpeed(20);
+		Motor.C.setStallThreshold(2, 100);
+		Motor.C.rotateTo(-90);
+		while(!Motor.C.isStalled()){
+			Delay.msDelay(10);
+		}
+		Motor.C.stop();
 	}
 	
 	public static void turnOfUltrasonic() {
@@ -240,7 +251,7 @@ for(int c = 0; c < 72; c++) {
 	}
 	
 	public static void returnToField() {
-		Delay.msDelay(10000);
+		pilot.travel(-100);
 		pilot.rotate(-90);
 		pilot.travel(100);
 	}

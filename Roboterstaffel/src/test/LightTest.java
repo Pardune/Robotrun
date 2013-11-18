@@ -148,12 +148,18 @@ public class LightTest {
 			else {							//line still found
 				pilot.forward();				
 				rotDist = 1;					
-				
-				if (dist.getDistance() < 20) { //wall found, going into position and return
-					pilot.stop();
-					if (turnAtEnd) pilot.rotate(180);
-					return;
-				}
+				if (turnAtEnd) {
+					if (dist.getDistance() < 20) { //wall found, going into position and return
+						pilot.stop();
+						pilot.rotate(180);
+						return;
+					}
+				} else {
+					if (dist.getDistance() < 5) { //wall found, going into position and return
+						pilot.stop();
+						return;
+					}
+				}	
 			}
 		}
 
