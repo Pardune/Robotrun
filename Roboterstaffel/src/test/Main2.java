@@ -13,7 +13,7 @@ import lejos.util.Delay;
 
 public class Main2 {
 	
-	static final DifferentialPilot pilot = new DifferentialPilot(43.2f, 160f, Motor.A, Motor.B, false);
+	static DifferentialPilot pilot = new DifferentialPilot(43.2f, 160f, Motor.A, Motor.B, false);
 	static boolean line = false;
 	
 	//Ich hoffe man kann meine Kommentare verstehen, leider funktioniert der Müll noch nicht so recht...
@@ -207,6 +207,7 @@ for(int c = 0; c < 72; c++) {
 	public static void main(String[] args) {
 		pilot.setAcceleration(50); //30 if floor slippery
 		pilot.setRotateSpeed(60);
+		LightTest.setPilot();
 		Button.waitForAnyPress();
 		LightTest.setLineValue();
 		CommSlave nxt = new CommSlave();
@@ -263,7 +264,7 @@ for(int c = 0; c < 72; c++) {
 		Motor.C.stop();
 	}
 
-	public static void mainAlgorithm(final DifferentialPilot pilot) {
+	public static void mainAlgorithm(DifferentialPilot pilot) {
 		
 		int peakRot;  //rotation direction of supposed can position
 		int peakDist; //distance to supposed can position
@@ -287,7 +288,13 @@ for(int c = 0; c < 72; c++) {
 				Sound.setVolume(100);
 				Sound.playNote(Sound.FLUTE, 1500, 1000);
 				Sound.playNote(Sound.FLUTE, 1500, 1000);
-				drive(450);
+				if(rotationArray[rotation]>65) {
+					drive(45);
+				} else if(rotationArray[rotation]>50) {
+					drive(30);
+				} else {
+				drive(rotationArray[rotation]-15);
+				}
 				continue;							//start turning and measuring again
 			}
 			peakDist = rotationArray[peakRot];
@@ -348,7 +355,13 @@ for(int c = 0; c < 72; c++) {
 			int [] rotationArray = rotateNscan();
 			int angle = findMaxDistance(rotationArray);
 			if(rotate(angle * 5)) return;
-			if(drive(450)) return;
+			if(rotationArray[angle]>65) {
+				if(drive(45)) return;
+			} else if(rotationArray[angle]>50) {
+				if(drive(30)) return;
+			} else {
+				if(drive(rotationArray[angle]-15)) return;
+			}
 		}
 	}
 

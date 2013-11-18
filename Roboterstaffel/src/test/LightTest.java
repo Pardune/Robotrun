@@ -42,6 +42,10 @@ public class LightTest {
 		//Delay.msDelay(1000);
 	}
 	
+	public static void setPilot() {
+		pilot.setAcceleration(60);
+	}
+	
 	public static void setLineValue(){
 		
 		floor = light.getLightValue();
@@ -132,7 +136,6 @@ public class LightTest {
 		int dir = 1;	
 		int rotDist = 1;
 		int wert;
-		pilot.setTravelSpeed(50);
 		
 		while (true) {
 			wert = light.getLightValue(); 				
@@ -166,7 +169,6 @@ public class LightTest {
 	}
 
 	public static void getOnLine() {
-		pilot.setTravelSpeed(50);
 		pilot.travel(1000,true);
 
 		Thread testLight = new Thread() {
