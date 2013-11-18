@@ -262,21 +262,27 @@ public class Main {
 			
 			if(peakRot == -1000) {					//no peak found
 
-				
-				int rotation = findMaxDistance(rotationArray)*5;
-				if(rotate(rotation)) {
+				int angle = findMaxDistance(rotationArray);
+				int optimAngle;
+
+				if(angle < 36) {
+					optimAngle = angle;
+				} else {
+					optimAngle = angle-72;
+				}
+				if(rotate(optimAngle*5)) {
 					pilot.rotate(-pilot.getAngleIncrement());
 					continue;
 				}
 				Sound.setVolume(100);
 				Sound.playNote(Sound.FLUTE, 1500, 1000);
 				Sound.playNote(Sound.FLUTE, 1500, 1000);
-				if(rotationArray[rotation]>65) {
-					drive(45);
-				} else if(rotationArray[rotation]>50) {
-					drive(30);
+				if(rotationArray[angle]>65) {
+					drive(450);
+				} else if(rotationArray[angle]>50) {
+					drive(300);
 				} else {
-				drive(rotationArray[rotation]-15);
+				drive((rotationArray[angle]-15)*10);
 				}
 				continue;						//start turning and measuring again
 			}
@@ -338,13 +344,20 @@ public class Main {
 		while(true) {
 			int [] rotationArray = rotateNscan();
 			int angle = findMaxDistance(rotationArray);
-			if(rotate(angle * 5)) return;
-			if(rotationArray[angle]>65) {
-				if(drive(45)) return;
-			} else if(rotationArray[angle]>50) {
-				if(drive(30)) return;
+			int optimAngle;
+			
+			if(angle < 36) {
+				optimAngle = angle;
 			} else {
-				if(drive(rotationArray[angle]-15)) return;
+				optimAngle = angle-72;
+			}
+			if(rotate(optimAngle * 5)) return;
+			if(rotationArray[angle]>65) {
+				if(drive(450)) return;
+			} else if(rotationArray[angle]>50) {
+				if(drive(300)) return;
+			} else {
+				if(drive((rotationArray[angle]-15)*10)) return;
 			}
 		}
 	}
