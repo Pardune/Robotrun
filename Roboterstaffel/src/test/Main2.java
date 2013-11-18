@@ -67,7 +67,7 @@ public class Main2 {
 			
 		int peak = -1000; //returned if no peak found
 		int i; //lowest unchecked distance
-		for(int c = 0; c < 72; c++) {
+for(int c = 0; c < 72; c++) {
 			
 			i = sortArray[c]; //get rotationArray index in order of c
 			
@@ -80,12 +80,14 @@ public class Main2 {
 			
 			if(rotationArray[i]>50) {
 				for(int k = -5+i; k < i; k++) {
+					if(rotationArray[(k+72)%72] >230 || rotationArray[(k+73)%72] >230 ) continue;
 					if(rotationArray[(k+72)%72] - rotationArray[(k+73)%72] > 20) {
 						foundLeftJump = true;
 						break;
 					}
 				}
 				for(int k = i; k < 5+i; k++) {
+					if(rotationArray[(k+72)%72] >230 || rotationArray[(k+73)%72] >230 ) continue;
 					if(rotationArray[k+1] - rotationArray[k] > 20) {
 						foundRightJump = true;
 						break;
@@ -94,12 +96,14 @@ public class Main2 {
 			}
 			else if(rotationArray[i]>30) {
 				for(int k = -7+i; k < i; k++) {
+					if(rotationArray[(k+72)%72] >230 || rotationArray[(k+73)%72] >230 ) continue;
 					if(rotationArray[(k+72)%72] - rotationArray[(k+73)%72] > 20) {
 						foundLeftJump = true;
 						break;
 					}
 				}
 				for(int k = i; k < 7+i; k++) {
+					if(rotationArray[(k+72)%72] >230 || rotationArray[(k+73)%72] >230 ) continue;
 					if(rotationArray[k+1] - rotationArray[k] > 20) {
 						foundRightJump = true;
 						break;
@@ -107,12 +111,14 @@ public class Main2 {
 				}
 			} else {
 				for(int k = -8+i; k < i; k++) {
+					if(rotationArray[(k+72)%72] >230 || rotationArray[(k+73)%72] >230 ) continue;
 					if(rotationArray[(k+72)%72] - rotationArray[(k+73)%72] > 20) {
 						foundLeftJump = true;
 						break;
 					}
 				}
 				for(int k = i; k < 8+i; k++) {
+					if(rotationArray[(k+72)%72] >230 || rotationArray[(k+73)%72] >230 ) continue;
 					if(rotationArray[k+1] - rotationArray[k] > 20) {
 						foundRightJump = true;
 						break;
@@ -348,17 +354,24 @@ public class Main2 {
 		if(rotate(peakRot*5)){ //convert to degree and rotate
 			pilot.rotate(-pilot.getAngleIncrement());
 			return false;
-		}					
+		};					
 		
-		if(peakDist > 27) {
-			if(drive(100))return false;
+		if(peakDist > 82) {
+
+			Sound.playNote(Sound.FLUTE, 300, 1000);
+			System.out.println("         A " + peakDist);
+			if(drive(300))return false;
+		}
+		else if(peakDist > 45) {
+
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			System.out.println("         A " + peakDist);
-		} else if(peakDist > 22){
-			if(drive(50))return false;
+			if(drive((peakDist-20)*10))return false;
+		} else if(peakDist > 20){
 			Sound.playNote(Sound.FLUTE, 1000, 1000);
 			System.out.println("         B " + peakDist);
+			if(drive(50))return false;
 		} else {						//can near enough to be grabbed
 			
 			Motor.C.setSpeed(8);
