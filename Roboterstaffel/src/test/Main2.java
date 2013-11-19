@@ -158,7 +158,7 @@ for(int c = 0; c < 72; c++) {
 	}
 	
 	static boolean drive(int distance) {
-		setLine(false);
+		line = false;
 		LightSensor light = new LightSensor(SensorPort.S1);
 		pilot.travel(distance, true);
 		while(pilot.isMoving()) {
@@ -167,15 +167,15 @@ for(int c = 0; c < 72; c++) {
 				pilot.stop();
 				while(pilot.isMoving()) Thread.yield();
 				pilot.setAcceleration(50);
-				setLine(true);
+				line = true;
 			}
 			Delay.msDelay(10);			
 		}
-		return getLine();
+		return line;
 	}
 	
 	static boolean rotate(int angle) {
-		setLine(false);
+		line = false;
 		LightSensor light = new LightSensor(SensorPort.S1);
 		pilot.rotate(angle, true);
 		while(pilot.isMoving()) {
@@ -184,11 +184,11 @@ for(int c = 0; c < 72; c++) {
 				pilot.stop();
 				while(pilot.isMoving()) Thread.yield();
 				pilot.setAcceleration(50);
-				setLine(true);
+				line = true;
 			}
 			Delay.msDelay(10);			
 		}
-		return getLine();
+		return line;
 	}
 	
 	public static void liftClaw() {
@@ -267,7 +267,7 @@ for(int c = 0; c < 72; c++) {
 		int peakDist; //distance to supposed can position
 		
 		while(true){
-			if(getLine()) {
+			if(line) {
 				foundLine();
 			}
 			int[] rotationArray = rotateNscan();
@@ -291,7 +291,7 @@ for(int c = 0; c < 72; c++) {
 				Sound.setVolume(100);
 				Sound.playNote(Sound.FLUTE, 1500, 1000);
 				Sound.playNote(Sound.FLUTE, 1500, 1000);
-				if(rotationArray[angle]>65) {
+				if(rotationArray[angle]>65) {			
 					drive(450);
 				} else if(rotationArray[angle]>50) {
 					drive(300);
@@ -340,13 +340,6 @@ for(int c = 0; c < 72; c++) {
 		return rotationArray;
 	}
 
-	private static boolean getLine() {
-		return line;
-	}
-	
-	private static void setLine(boolean lineBool) {
-		line = lineBool;
-	}
 
 	public static void foundLine() {
 		pilot.rotate(180);
