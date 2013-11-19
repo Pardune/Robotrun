@@ -79,7 +79,7 @@ public class Main {
 			
 			if(rotationArray[i]>50) {
 				for(int k = -5+i; k < i; k++) {
-					if(rotationArray[(k+72)%72] ==255 || rotationArray[(k+73)%72] ==255 ) continue;
+					if(rotationArray[(k+72)%72] ==255 || rotationArray[(k+73)%72] ==255 ) continue;	//don't use values for peak search if they equal 255 (255 has high error probability)
 					if(rotationArray[(k+72)%72] - rotationArray[(k+73)%72] > 15) {
 						foundLeftJump = true;
 						break;
@@ -93,7 +93,7 @@ public class Main {
 					}
 				}
 			}
-			else if(rotationArray[i]>30) {
+			else if(rotationArray[i]>45) {	//search above distance of 45 for peak because smaller distances are not as precise
 				for(int k = -7+i; k < i; k++) {
 					if(rotationArray[(k+72)%72] ==255 || rotationArray[(k+73)%72] ==255 ) continue;
 					if(rotationArray[(k+72)%72] - rotationArray[(k+73)%72] > 15) {
@@ -108,21 +108,24 @@ public class Main {
 						break;
 					}
 				}
+//			} else {
+//				for(int k = -8+i; k < i; k++) {
+//					if(rotationArray[(k+72)%72] ==255 || rotationArray[(k+73)%72] ==255 ) continue;
+//					if(rotationArray[(k+72)%72] - rotationArray[(k+73)%72] > 15) {
+//						foundLeftJump = true;
+//						break;
+//					}
+//				}
+//				for(int k = i; k < 8+i; k++) {
+//					if(rotationArray[(k+72)%72] ==255 || rotationArray[(k+73)%72] ==255 ) continue;
+//					if(rotationArray[k+1] - rotationArray[k] > 15) {
+//						foundRightJump = true;
+//						break;
+//					}
+//				}
+//			}
 			} else {
-				for(int k = -8+i; k < i; k++) {
-					if(rotationArray[(k+72)%72] ==255 || rotationArray[(k+73)%72] ==255 ) continue;
-					if(rotationArray[(k+72)%72] - rotationArray[(k+73)%72] > 15) {
-						foundLeftJump = true;
-						break;
-					}
-				}
-				for(int k = i; k < 8+i; k++) {
-					if(rotationArray[(k+72)%72] ==255 || rotationArray[(k+73)%72] ==255 ) continue;
-					if(rotationArray[k+1] - rotationArray[k] > 15) {
-						foundRightJump = true;
-						break;
-					}
-				}
+				continue;
 			}
 			if(foundLeftJump && foundRightJump) {
 				peak = i;
@@ -396,7 +399,7 @@ public class Main {
 			System.out.println("         A " + peakDist);
 			if(drive((peakDist-20)*10))return false;
 			Motor.C.setSpeed(50);
-			Motor.C.rotateTo(50);			//open claw
+			Motor.C.rotateTo(90);			//open claw
 			Delay.msDelay(4000);
 			UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
 			while(us.getDistance()>5) {		//drive to can stopping 5 cm in front of u.s.sensor
