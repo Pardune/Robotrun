@@ -34,9 +34,7 @@ public class Main {
 		}
 		System.out.println("          " + rotationArray[maxDistanceRot]);
 		
-		if(maxDistanceRot < 36) {
-			return maxDistanceRot;
-		} else return maxDistanceRot - 72;
+		return maxDistanceRot;
 		
 		
 	}
@@ -81,15 +79,15 @@ public class Main {
 			
 			if(rotationArray[i]>50) {
 				for(int k = -5+i; k < i; k++) {
-					if(rotationArray[(k+72)%72] >230 || rotationArray[(k+73)%72] >230 ) continue;
-					if(rotationArray[(k+72)%72] - rotationArray[(k+73)%72] > 20) {
+					if(rotationArray[(k+72)%72] ==255 || rotationArray[(k+73)%72] ==255 ) continue;
+					if(rotationArray[(k+72)%72] - rotationArray[(k+73)%72] > 15) {
 						foundLeftJump = true;
 						break;
 					}
 				}
 				for(int k = i; k < 5+i; k++) {
-					if(rotationArray[(k+72)%72] >230 || rotationArray[(k+73)%72] >230 ) continue;
-					if(rotationArray[k+1] - rotationArray[k] > 20) {
+					if(rotationArray[(k+72)%72] ==255 || rotationArray[(k+73)%72] ==255 ) continue;
+					if(rotationArray[k+1] - rotationArray[k] > 15) {
 						foundRightJump = true;
 						break;
 					}
@@ -97,42 +95,39 @@ public class Main {
 			}
 			else if(rotationArray[i]>30) {
 				for(int k = -7+i; k < i; k++) {
-					if(rotationArray[(k+72)%72] >230 || rotationArray[(k+73)%72] >230 ) continue;
-					if(rotationArray[(k+72)%72] - rotationArray[(k+73)%72] > 20) {
+					if(rotationArray[(k+72)%72] ==255 || rotationArray[(k+73)%72] ==255 ) continue;
+					if(rotationArray[(k+72)%72] - rotationArray[(k+73)%72] > 15) {
 						foundLeftJump = true;
 						break;
 					}
 				}
 				for(int k = i; k < 7+i; k++) {
-					if(rotationArray[(k+72)%72] >230 || rotationArray[(k+73)%72] >230 ) continue;
-					if(rotationArray[k+1] - rotationArray[k] > 20) {
+					if(rotationArray[(k+72)%72] ==255 || rotationArray[(k+73)%72] ==255) continue;
+					if(rotationArray[k+1] - rotationArray[k] > 15) {
 						foundRightJump = true;
 						break;
 					}
 				}
 			} else {
 				for(int k = -8+i; k < i; k++) {
-					if(rotationArray[(k+72)%72] >230 || rotationArray[(k+73)%72] >230 ) continue;
-					if(rotationArray[(k+72)%72] - rotationArray[(k+73)%72] > 20) {
+					if(rotationArray[(k+72)%72] ==255 || rotationArray[(k+73)%72] ==255 ) continue;
+					if(rotationArray[(k+72)%72] - rotationArray[(k+73)%72] > 15) {
 						foundLeftJump = true;
 						break;
 					}
 				}
 				for(int k = i; k < 8+i; k++) {
-					if(rotationArray[(k+72)%72] >230 || rotationArray[(k+73)%72] >230 ) continue;
-					if(rotationArray[k+1] - rotationArray[k] > 20) {
+					if(rotationArray[(k+72)%72] ==255 || rotationArray[(k+73)%72] ==255 ) continue;
+					if(rotationArray[k+1] - rotationArray[k] > 15) {
 						foundRightJump = true;
 						break;
 					}
 				}
 			}
-			
 			if(foundLeftJump && foundRightJump) {
 				peak = i;
 				break;
 			}
-			
-			
 			
 			
 			//if(rotationArray[i+2]<13) { //small distance -> pedestal at least 3 times in array
@@ -208,7 +203,7 @@ public class Main {
 	public static void main(String[] args) {
 		Delay.msDelay(10000);
 		pilot.setAcceleration(50); //30 if floor slippery
-		pilot.setRotateSpeed(60);
+		pilot.setRotateSpeed(20);
 		LightTest.setPilot();
 		Button.waitForAnyPress();
 		LightTest.setLineValue();
@@ -234,7 +229,7 @@ public class Main {
 	
 	public static void returnToField() {
 		pilot.rotate(-90);
-		pilot.travel(100);
+		pilot.travel(150);
 	}
 	
 	private static void releaseCan() {
@@ -316,6 +311,28 @@ public class Main {
 		
 			}
 		
+//		int[] rotationArray = new int[81];
+//		UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
+//		int a;
+//		int b;
+//		for (int i=1; i < 72; i++){
+//			
+//			while(pilot.isMoving()) Thread.yield();
+//			a = us.getDistance();
+//			b = us.getDistance();
+//			if(a == 255) {
+//				rotationArray[i] = b;
+//			} else if(b == 255) {
+//				rotationArray[i] = a;
+//			} else {
+//				rotationArray[i] = (int) (a+b)/2;
+//			}
+//			System.out.println("          " + rotationArray[i]);
+//			Delay.msDelay(160);				// since ultrasonic sensor needs 75ms between readings
+//			pilot.rotate(5);				// 5 degrees left
+
+//		}
+		
 		rotationArray[72]=rotationArray[0];		//let measurements overlap
 		rotationArray[73]=rotationArray[1];
 		rotationArray[74]=rotationArray[2];
@@ -378,16 +395,15 @@ public class Main {
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			System.out.println("         A " + peakDist);
 			if(drive((peakDist-20)*10))return false;
-		} else if(peakDist > 20){
-			Sound.playNote(Sound.FLUTE, 1000, 1000);
-			System.out.println("         B " + peakDist);
-			if(drive((peakDist - 15)*10))return false;
-		} else {						//can near enough to be grabbed
-			
-			Motor.C.setSpeed(8);
+			Motor.C.setSpeed(50);
 			Motor.C.rotateTo(50);			//open claw
 			Delay.msDelay(4000);
-			drive(Math.abs((peakDist - 4)*10));	//drive to can stopping 10 cm in front of u.s.sensor
+			UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
+			while(us.getDistance()>5) {		//drive to can stopping 5 cm in front of u.s.sensor
+				if(drive(2)) return false;
+			}
+				
+			
 			Motor.C.rotateTo(-25);			//close claw
 			Motor.C.setSpeed(20);
 			Motor.C.setStallThreshold(2, 100);
@@ -400,7 +416,32 @@ public class Main {
 			grabbedCan = true;			//can now grabbed
 			Sound.playNote(Sound.FLUTE, 1500, 1000);
 			System.out.println("         C " + peakDist);
-		}
+//		} else if(peakDist > 20){
+//			Sound.playNote(Sound.FLUTE, 1000, 1000);
+//			System.out.println("         B " + peakDist);
+//			if(drive((peakDist - 15)*10))return false;
+//		} else {						//can near enough to be grabbed
+//			
+//			Motor.C.setSpeed(50);
+//			Motor.C.rotateTo(50);			//open claw
+//			Delay.msDelay(4000);
+//			drive(Math.abs((peakDist - 4)*10));	//drive to can stopping 10 cm in front of u.s.sensor
+//			Motor.C.rotateTo(-25);			//close claw
+//			Motor.C.setSpeed(20);
+//			Motor.C.setStallThreshold(2, 100);
+//			Motor.C.rotateTo(-90);
+//			while(!Motor.C.isStalled()){
+//				Delay.msDelay(10);
+//			}
+//			Motor.C.stop();
+////			Delay.msDelay(4000);		//wait to ensure claw closure
+//			grabbedCan = true;			//can now grabbed
+//			Sound.playNote(Sound.FLUTE, 1500, 1000);
+//			System.out.println("         C " + peakDist);
+//		}
+		
+		} else return false;
+			
 		while(pilot.isMoving())Thread.yield();
 		return grabbedCan;
 		
