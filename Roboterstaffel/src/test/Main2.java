@@ -216,8 +216,19 @@ for(int c = 0; c < 72; c++) {
 			
 			findLine();
 			LightTest.handleLine(true);
-			grabCan();
+			//grabCan(); 	//TODO
+			
+			Motor.C.setSpeed(8);
+			Motor.C.rotateTo(50);			//open claw
+			Delay.msDelay(2000);
+			LightTest.followLine(false);
+			pilot.travel(150);
+			Motor.C.rotateTo(-25);
+			
 			nxt.sendReady();
+			Motor.C.rotateTo(-90);
+			Motor.C.stop();
+			
 			returnToField();
 			mainAlgorithm(pilot);
 			nxt.sendReady();
@@ -226,7 +237,7 @@ for(int c = 0; c < 72; c++) {
 	public static void grabCan() {
 		Motor.C.setSpeed(8);
 		Motor.C.rotateTo(50);			//open claw
-		Delay.msDelay(4000);
+		Delay.msDelay(2000);
 		LightTest.followLine(false);
 		pilot.travel(150);
 		Motor.C.rotateTo(-25);			//close claw
@@ -246,7 +257,7 @@ for(int c = 0; c < 72; c++) {
 	
 	public static void returnToField() {
 		pilot.travel(-100);
-		pilot.rotate(-90);
+		pilot.rotate(90);
 		pilot.travel(100);
 	}
 		
