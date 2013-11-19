@@ -119,7 +119,7 @@ public class LightTest {
 	
 	public static void followLine(boolean turnAtEnd) {
 		
-		pilot.setAcceleration(1000);
+		pilot.setAcceleration(60);
 		int angle = 3;	
 		int dir = 1;	
 		int rotDist = 1;
@@ -128,7 +128,9 @@ public class LightTest {
 		while (true) {
 			wert = light.getLightValue(); 				
 			if (line - wert > 1) {					//line lost
+				pilot.setAcceleration(1000);
 				pilot.stop();	
+				pilot.setAcceleration(60);
 				while(line - wert > 1) {			//trying to find line with increasing angles
 					pilot.rotate(angle*dir*rotDist);	
 					dir *= -1;			
@@ -141,6 +143,7 @@ public class LightTest {
 				rotDist = 1;					
 				if (turnAtEnd) {
 					if (dist.getDistance() < 20) { //wall found, going into position and return
+						pilot.setAcceleration(1000);
 						pilot.stop();
 						pilot.rotate(180);
 						pilot.setAcceleration(60);
@@ -148,6 +151,7 @@ public class LightTest {
 					}
 				} else {
 					if (dist.getDistance() < 21) { //wall found, going into position and return
+						pilot.setAcceleration(1000);
 						pilot.stop();
 						pilot.setAcceleration(60);
 						return;
