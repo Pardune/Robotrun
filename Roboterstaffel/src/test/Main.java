@@ -21,8 +21,8 @@ public class Main {
 	/**
 	 * @param args
 	 */
-	static int findMaxDistance(int[] rotationArray) {	//drive to biggest distance, makes collisions unlikely but still possible
-		int maxDistance = 0;							//robot should drive into the center to ease can detection -> line detection has to be implemented
+	static int findMaxDistance(int[] rotationArray) {	//calculate to biggest distance, makes collisions unlikely but still possible
+		int maxDistance = 0;							//robot should drive into the center to ease can detection -> then handle line (avoid or drive onto it)
 		int maxDistanceRot = 0;
 		for(int i = 0; i < 72; i++) {
 			int newDistance = rotationArray[i] + rotationArray[i+1] + rotationArray[i+2] + rotationArray[i+3]		//possibly to many values -> wrong directions & higher collision danger?
@@ -162,7 +162,7 @@ public class Main {
 	}
 	
 	static boolean drive(int distance) {
-		setLine(false);
+		line = false;
 		LightSensor light = new LightSensor(SensorPort.S1);
 		pilot.travel(distance, true);
 		while(pilot.isMoving()) {
@@ -171,15 +171,15 @@ public class Main {
 				pilot.stop();
 				while(pilot.isMoving()) Thread.yield();
 				pilot.setAcceleration(50);
-				setLine(true);
+				line = true;
 			}
 			Delay.msDelay(10);			
 		}
-		return getLine();
+		return line;
 	}
 	
 	static boolean rotate(int angle) {
-		setLine(false);
+		line = false;
 		LightSensor light = new LightSensor(SensorPort.S1);
 		pilot.rotate(angle, true);
 		while(pilot.isMoving()) {
@@ -188,11 +188,11 @@ public class Main {
 				pilot.stop();
 				while(pilot.isMoving()) Thread.yield();
 				pilot.setAcceleration(50);
-				setLine(true);
+				line = true;
 			}
 			Delay.msDelay(10);			
 		}
-		return getLine();
+		return line;
 	}
 
 	public static void liftClaw() {
@@ -220,6 +220,7 @@ public class Main {
 			turnOfUltrasonic();
 			nxt.sendReady();
 			nxt.waitForAnswer();
+			Delay.msDelay(10000);
 			releaseCan();
 			returnToField();
 			nxt.waitForAnswer();
@@ -232,7 +233,6 @@ public class Main {
 	}
 	
 	public static void returnToField() {
-		Delay.msDelay(10000);
 		pilot.rotate(-90);
 		pilot.travel(100);
 	}
@@ -253,43 +253,44 @@ public class Main {
 		int peakDist; //distance to supposed can position
 		
 		while(true){
-			if(getLine()) {
-				avoidLine();
-			}
-			int[] rotationArray = rotateNscan();
+			if (line) avoidLine();
 			
-			peakRot = findPeak(rotationArray);
+			int[] rotationArray = rotateNscan(); //get array with distance values
 			
-			if(peakRot == -1000) {					//no peak found
+			peakRot = findPeak(rotationArray);	//find angle in which the pedestal possible is (distance peak)	
+			
+			if (peakRot == -1000) {					//no peak found, error handling -> avoid obstacle (try again later)
 
-				int angle = findMaxDistance(rotationArray);
-				int optimAngle;
+				int angle = findMaxDistance(rotationArray); 
+				int optimAngle; 
 
 				if(angle < 36) {
-					optimAngle = angle;
+					optimAngle = angle;		//rotate right
 				} else {
-					optimAngle = angle-72;
+					optimAngle = angle-72;	//rotate left
 				}
-				if(rotate(optimAngle*5)) {
+				
+				if(rotate(optimAngle*5)) {						//robot ended on line, undo rotation
 					pilot.rotate(-pilot.getAngleIncrement());
 					continue;
 				}
+				
 				Sound.setVolume(100);
 				Sound.playNote(Sound.FLUTE, 1500, 1000);
 				Sound.playNote(Sound.FLUTE, 1500, 1000);
-				if(rotationArray[angle]>65) {
+				if(rotationArray[angle]>65) {			//TODO comment
 					drive(450);
-				} else if(rotationArray[angle]>50) {
+				} else if(rotationArray[angle]>50) {	//TODO comment
 					drive(300);
 				} else {
-				drive((rotationArray[angle]-15)*10);
+				drive((rotationArray[angle]-15)*10);	//TODO comment
 				}
 				continue;						//start turning and measuring again
 			}
 			peakDist = rotationArray[peakRot];
-			if(driveNGrabCan(peakRot, peakDist)) { //true when can found and grabbed
+			if(driveNGrabCan(peakRot, peakDist)) { //true if can found and grabbed
 				findLine();
-				return; 									  //stop for now -> for complete program add function here
+				return; 							//stop for now -> for complete program add function here
 			}
 		}
 	}
@@ -325,14 +326,6 @@ public class Main {
 		rotationArray[79]=rotationArray[7];
 		rotationArray[80]=rotationArray[8];
 		return rotationArray;
-	}
-
-	private static boolean getLine() {
-		return line;
-	}
-	
-	private static void setLine(boolean lineBool) {
-		line = lineBool;
 	}
 
 	public static void avoidLine() {
@@ -373,7 +366,7 @@ public class Main {
 			return false;
 		};					
 		
-		if(peakDist > 82) {
+		if(peakDist > 82) {							
 
 			Sound.playNote(Sound.FLUTE, 300, 1000);
 			System.out.println("         A " + peakDist);
