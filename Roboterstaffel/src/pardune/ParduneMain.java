@@ -10,7 +10,9 @@ public class ParduneMain {
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-		//objects = new ObjectsPardune();
-		communication = new Communications();
+		
+		objects = new ObjectsPardune();
+		//communication = new Communications();
+		
 	}
 }
