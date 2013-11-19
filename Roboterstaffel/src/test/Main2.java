@@ -191,10 +191,10 @@ for(int c = 0; c < 72; c++) {
 		return line;
 	}
 	
-	public static void liftClaw() {
+	public static void liftClaw(int angle) {
 		Motor.C.setSpeed(20);
 		Motor.C.setStallThreshold(2, 100);
-		Motor.C.rotateTo(-90);
+		Motor.C.rotateTo(angle);
 		while(!Motor.C.isStalled()){
 			Delay.msDelay(10);
 		}
@@ -211,23 +211,34 @@ for(int c = 0; c < 72; c++) {
 
 		while (true) {
 			turnOfUltrasonic();
-			liftClaw();
+			liftClaw(-90);
 			nxt.waitForAnswer();
 			
-			findLine();
-			LightTest.handleLine(true);
-			//grabCan(); 	//TODO
+			findLine();					//linie gefunden
+			LightTest.handleLine(true);	//steht in pos gegenüber von 1
 			
-			Motor.C.setSpeed(8);
-			Motor.C.rotateTo(50);			//open claw
+			liftClaw(90);
+			/*Motor.C.stop();
+			Motor.C.setSpeed(50);
+			Motor.C.rotateTo(90);*/
+			
+			
 			Delay.msDelay(2000);
 			LightTest.followLine(false);
 			pilot.travel(150);
-			Motor.C.rotateTo(-25);
 			
+			liftClaw(-25);
+			/*Motor.C.setSpeed(50);
+			Motor.C.rotateTo(-25);*/
+			
+			Delay.msDelay(2000);
 			nxt.sendReady();
+			
+			liftClaw(-90);
+			/*Motor.C.setSpeed(50);
 			Motor.C.rotateTo(-90);
-			Motor.C.stop();
+			
+			Motor.C.stop();*/
 			
 			returnToField();
 			mainAlgorithm(pilot);

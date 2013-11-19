@@ -10,6 +10,7 @@ public class Claw {
 		Motor.C.rotateTo(90);
 		Delay.msDelay(2000);
 		Motor.C.rotateTo(0);
+		
 	}
 
 }
