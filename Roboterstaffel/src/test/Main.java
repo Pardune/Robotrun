@@ -125,29 +125,60 @@ public class Main {
 		} else return false;
 	}
 
-	static int[] preciseScan(int[] rotationArray) {
+	static int preciseScan() {
 		UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
 		int measured=0;
-		rotationArray= new int[82];
-		for (int i=0; i < 72; i++) {
-
+		int min=1000;
+		int peak = 0;
+		for (int i=0; i < 5; i++) {
+			int value=0;
 			int numValidMeasurements = 0;
 			for(int j = 0; j<5; j++) {
 				measured = us.getDistance();
 				if (measured != 255) {
-					rotationArray[i] += measured;
+					value += measured;
 					numValidMeasurements++;
 				}
 			}
 			if(numValidMeasurements == 0) {
-				rotationArray[i] = measured;
+				value = measured;
 			} else {
-				rotationArray[i] = (int) (measured/numValidMeasurements);
+				value = (int) (measured/numValidMeasurements);
+			}
+			if(min > value) {
+				min = value;
+				peak = i;
 			}
 			pilot.rotate(5);				// 5 degrees left
 			while(pilot.isMoving()) Thread.yield();
 		}
-		return rotationArray;
+		pilot.rotate(-25);				// 5 degrees left
+		while(pilot.isMoving()) Thread.yield();
+		for (int i=0; i > -5; i--) {
+			int value=0;
+			int numValidMeasurements = 0;
+			for(int j = 0; j<5; j++) {
+				measured = us.getDistance();
+				if (measured != 255) {
+					value += measured;
+					numValidMeasurements++;
+				}
+			}
+			if(numValidMeasurements == 0) {
+				value = measured;
+			} else {
+				value = (int) (measured/numValidMeasurements);
+			}
+			if(min > value) {
+				min = value;
+				peak = i;
+			}
+			pilot.rotate(-5);				// 5 degrees left
+			while(pilot.isMoving()) Thread.yield();
+		}
+		pilot.rotate(25);				// 5 degrees left
+		while(pilot.isMoving()) Thread.yield();
+		return peak;
 	}
 
 	static boolean drive(int distance) {
@@ -391,65 +422,74 @@ public class Main {
 			System.out.println("         B " + peakDist);
 			if(drive((peakDist-20)*10))return false;
 
-			int[] rotationArray = new int[82];
-			rotationArray = preciseScan(rotationArray);
-
-			int[] sortArray = arraySort(rotationArray);
-			int peak = sortArray[0]; //get rotationArray index in order of c
+			int peak = preciseScan();
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			System.out.println("         C " + peakDist);
 			rotate(peak*5);
 
-			Motor.C.setSpeed(50);
-			Motor.C.setStallThreshold(2, 100);
 			Motor.C.stop();
-			Motor.C.rotateTo(90);			//open claw
-			while(!Motor.C.isStalled()){
-				Delay.msDelay(10);
+			Motor.C.setSpeed(100);
+			Motor.C.rotate(1);
+			Motor.C.setStallThreshold(3, 100);
+			while(!Motor.C.isStalled()) {		//open Claw
+				Motor.C.rotate(1);
 			}
+			Motor.C.rotate(-3);
+			Motor.C.stop();
+			
 			UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
 			while(us.getDistance()>6) {		//drive to can stopping 5 cm in front of u.s.sensor
 				if(drive(10)) return false;
 			}
+			Motor.C.rotate(-1);
+			Motor.C.setStallThreshold(3, 100);
+			while(!Motor.C.isStalled()) {		//open Claw
+				Motor.C.rotate(-1);
+			}
+			Motor.C.rotate(+3);
+			Motor.C.stop();
+			
+			//			Delay.msDelay(4000);		//wait to ensure claw closure
+			grabbedCan = true;			//can now grabbed
+			Sound.playNote(Sound.FLUTE, 1500, 1000);
+			System.out.println("         C " + peakDist);
+		} else {
+			int peak = preciseScan();
+			Sound.playNote(Sound.FLUTE, 500, 1000);
+			Sound.playNote(Sound.FLUTE, 500, 1000);
+			Sound.playNote(Sound.FLUTE, 500, 1000);
+			System.out.println("         C " + peakDist);
+			rotate(peak*5);
 
 			Motor.C.stop();
-			Motor.C.rotateTo(-25);			//close claw
-			Motor.C.setSpeed(20);
-			Motor.C.rotateTo(-90);
-			while(!Motor.C.isStalled()){
-				Delay.msDelay(10);
+			Motor.C.setSpeed(100);
+			Motor.C.rotate(1);
+			Motor.C.setStallThreshold(3, 100);
+			while(!Motor.C.isStalled()) {		//open Claw
+				Motor.C.rotate(1);
 			}
+			Motor.C.rotate(-3);
 			Motor.C.stop();
+			
+			UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
+			while(us.getDistance()>6) {		//drive to can stopping 5 cm in front of u.s.sensor
+				if(drive(10)) return false;
+			}
+			Motor.C.rotate(-1);
+			Motor.C.setStallThreshold(3, 100);
+			while(!Motor.C.isStalled()) {		//open Claw
+				Motor.C.rotate(-1);
+			}
+			Motor.C.rotate(+3);
+			Motor.C.stop();
+			
 			//			Delay.msDelay(4000);		//wait to ensure claw closure
 			grabbedCan = true;			//can now grabbed
 			Sound.playNote(Sound.FLUTE, 1500, 1000);
 			System.out.println("         C " + peakDist);
 		}
-		//		} else if(peakDist > 20){
-		//			Sound.playNote(Sound.FLUTE, 1000, 1000);
-		//			System.out.println("         B " + peakDist);
-		//			if(drive((peakDist - 15)*10))return false;
-		//		} else {						//can near enough to be grabbed
-		//			
-		//			Motor.C.setSpeed(50);
-		//			Motor.C.rotateTo(50);			//open claw
-		//			Delay.msDelay(4000);
-		//			drive(Math.abs((peakDist - 4)*10));	//drive to can stopping 10 cm in front of u.s.sensor
-		//			Motor.C.rotateTo(-25);			//close claw
-		//			Motor.C.setSpeed(20);
-		//			Motor.C.setStallThreshold(2, 100);
-		//			Motor.C.rotateTo(-90);
-		//			while(!Motor.C.isStalled()){
-		//				Delay.msDelay(10);
-		//			}
-		//			Motor.C.stop();
-		////			Delay.msDelay(4000);		//wait to ensure claw closure
-		//			grabbedCan = true;			//can now grabbed
-		//			Sound.playNote(Sound.FLUTE, 1500, 1000);
-		//			System.out.println("         C " + peakDist);
-		//		}
 
 		while(pilot.isMoving())Thread.yield();
 		return grabbedCan;
