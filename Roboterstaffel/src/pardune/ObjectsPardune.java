@@ -94,6 +94,7 @@ public class ObjectsPardune {
 			} else{
 				pilot.rotate(i*5);
 			}
+			Delay.msDelay(50000);
 
 			// gib distanz aus
 			System.out.println("distance to feature: " + measurements[i]);
@@ -102,7 +103,7 @@ public class ObjectsPardune {
 	}
 	
 	public void findPodestPar(int vals){
-		measurements = new int[vals];
+		measurements = new   int[vals];
 		pilot.rotate((vals-1)/2);
 		
 	}
