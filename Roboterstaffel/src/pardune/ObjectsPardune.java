@@ -27,7 +27,13 @@ public class ObjectsPardune {
 		foundPodest = false;
 
 		// run the actual program
-		findPodest();
+		//findPodest();
+		alg();
+	}
+
+	private void alg() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	private void findPodest() {
