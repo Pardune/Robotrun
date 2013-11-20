@@ -17,7 +17,7 @@ public class Main {
 	static DifferentialPilot pilot = new DifferentialPilot(43.2f, 160f, Motor.A, Motor.B, false);
 	static boolean line = false;
 	
-	//Ich hoffe man kann meine Kommentare verstehen, leider funktioniert der Müll noch nicht so recht...
+	b//Ich hoffe man kann meine Kommentare verstehen, leider funktioniert der Müll noch nicht so recht...
 	/**
 	 * @param args
 	 */
@@ -399,11 +399,12 @@ public class Main {
 			System.out.println("         A " + peakDist);
 			if(drive((peakDist-20)*10))return false;
 			Motor.C.setSpeed(50);
+			Motor.C.stop();
 			Motor.C.rotateTo(90);			//open claw
 			Delay.msDelay(4000);
 			UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
-			while(us.getDistance()>5) {		//drive to can stopping 5 cm in front of u.s.sensor
-				if(drive(2)) return false;
+			while(us.getDistance()>6) {		//drive to can stopping 5 cm in front of u.s.sensor
+				if(drive(10)) return false;
 			}
 				
 			
