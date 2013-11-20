@@ -10,6 +10,7 @@ import lejos.nxt.Sound;
 import lejos.nxt.UltrasonicSensor;
 import lejos.robotics.navigation.DifferentialPilot;
 import lejos.util.Delay;
+
 import java.lang.Math;
 
 public class Main {
@@ -17,7 +18,6 @@ public class Main {
 	static DifferentialPilot pilot = new DifferentialPilot(43.2f, 160f, Motor.A, Motor.B, false);
 	static boolean line = false;
 	
-	//Ich hoffe man kann meine Kommentare verstehen, leider funktioniert der Müll noch nicht so recht...
 	/**
 	 * @param args
 	 */
@@ -40,6 +40,63 @@ public class Main {
 	}
 	
 	static int findPeak(int[] rotationArray) {
+
+		int[] sortArray = arraySort(rotationArray);
+		int peak = -1000; //returned if no peak found
+		int i; //lowest unchecked distance
+		for(int c = 0; c < 72; c++) {
+			
+			i = sortArray[c]; //get rotationArray index in order of c
+			
+			if(rotationArray[i]>170) continue; 			// don't choose peak that's further away than 80 cm
+			
+			//###
+			
+			
+			
+			if(rotationArray[i]>50) {
+				if(jumpFinder(rotationArray, 5, i)) {
+					peak = i;
+					break;
+				}
+			}
+			else if(rotationArray[i]>45) {	//search above distance of 45 for peak because smaller distances are not as precise
+				if(jumpFinder(rotationArray, 7, i)) {
+					peak = i;
+					break;
+				}
+			} else {
+				if(jumpFinder(rotationArray, 8, i)) {
+					
+					// measure, compare difference
+					// if: corner(pos to neg): continue
+					// else: retreive dose (pos to neg to pos)
+	
+					// put first measurement value, therfor the for-loop wont change
+					
+					// fill measurments and diff-array via loop
+					
+					rotationArray = preciseScan(rotationArray);
+					
+					sortArray = arraySort(rotationArray);
+					for(c = 0; c < 72; c++) {
+						
+						i = sortArray[c]; //get rotationArray index in order of c
+						
+						if(rotationArray[i]>170) continue; 			// don't choose peak that's further away than 80 cm
+						if(jumpFinder(rotationArray, 8, i)) {
+							peak = i;
+						}
+					
+					}
+					break;
+				}
+			}
+		}
+		return peak;
+	}
+	
+	static int[] arraySort(int[] rotationArray) {
 		int temp1;		//rotationArray temp
 		int temp2;		//sortArray temp
 		int[] rotationArray2 = rotationArray.clone(); 	//duplicate to sort distances in increasing order
@@ -63,100 +120,56 @@ public class Main {
 				
 			}
 		}
-			
-		int peak = -1000; //returned if no peak found
-		int i; //lowest unchecked distance
-		for(int c = 0; c < 72; c++) {
-			
-			i = sortArray[c]; //get rotationArray index in order of c
-			
-			if(rotationArray[i]>70) continue; 			// don't choose peak that's further away than 80 cm
-			
-			//###
-			
-			boolean foundLeftJump = false;
-			boolean foundRightJump = false;
-			
-			if(rotationArray[i]>50) {
-				for(int k = -5+i; k < i; k++) {
-					if(rotationArray[(k+72)%72] ==255 || rotationArray[(k+73)%72] ==255 ) continue;	//don't use values for peak search if they equal 255 (255 has high error probability)
-					if(rotationArray[(k+72)%72] - rotationArray[(k+73)%72] > 15) {
-						foundLeftJump = true;
-						break;
-					}
-				}
-				for(int k = i; k < 5+i; k++) {
-					if(rotationArray[(k+72)%72] ==255 || rotationArray[(k+73)%72] ==255 ) continue;
-					if(rotationArray[k+1] - rotationArray[k] > 15) {
-						foundRightJump = true;
-						break;
-					}
-				}
-			}
-			else if(rotationArray[i]>45) {	//search above distance of 45 for peak because smaller distances are not as precise
-				for(int k = -7+i; k < i; k++) {
-					if(rotationArray[(k+72)%72] ==255 || rotationArray[(k+73)%72] ==255 ) continue;
-					if(rotationArray[(k+72)%72] - rotationArray[(k+73)%72] > 15) {
-						foundLeftJump = true;
-						break;
-					}
-				}
-				for(int k = i; k < 7+i; k++) {
-					if(rotationArray[(k+72)%72] ==255 || rotationArray[(k+73)%72] ==255) continue;
-					if(rotationArray[k+1] - rotationArray[k] > 15) {
-						foundRightJump = true;
-						break;
-					}
-				}
-//			} else {
-//				for(int k = -8+i; k < i; k++) {
-//					if(rotationArray[(k+72)%72] ==255 || rotationArray[(k+73)%72] ==255 ) continue;
-//					if(rotationArray[(k+72)%72] - rotationArray[(k+73)%72] > 15) {
-//						foundLeftJump = true;
-//						break;
-//					}
-//				}
-//				for(int k = i; k < 8+i; k++) {
-//					if(rotationArray[(k+72)%72] ==255 || rotationArray[(k+73)%72] ==255 ) continue;
-//					if(rotationArray[k+1] - rotationArray[k] > 15) {
-//						foundRightJump = true;
-//						break;
-//					}
-//				}
-//			}
-			} else {
-				continue;
-			}
-			if(foundLeftJump && foundRightJump) {
-				peak = i;
+		return sortArray;
+	}
+	
+	static boolean jumpFinder(int[] rotationArray, int angleSegment, int i) {
+
+		boolean foundLeftJump = false;
+		boolean foundRightJump = false;
+		for(int k = -angleSegment+i; k < i; k++) {
+			if(rotationArray[(k+72)%72] ==255 || rotationArray[(k+73)%72] ==255 ) continue;	//don't use values for peak search if they equal 255 (255 has high error probability)
+			if(rotationArray[(k+72)%72] - rotationArray[(k+73)%72] > 15) {
+				foundLeftJump = true;
 				break;
 			}
-			
-			
-			//if(rotationArray[i+2]<13) { //small distance -> pedestal at least 3 times in array
-//				if (rotationArray[i]+15 < rotationArray[i+2] && rotationArray[i+1]+15 < rotationArray[i+2]
-//						&& rotationArray[i+2] <= rotationArray[i+3] && rotationArray[i+3] >= rotationArray[i+4]
-//							&& rotationArray[i+4] > rotationArray[i+5]+15 && rotationArray[i+4] > rotationArray[i+6]+15) {
-//					peak = i+3;
-//					break;
-//				}
-			//}
-
-			
-		
-//			int currentCenter = (int) ((rotationArray[i-1 + extender] + rotationArray[i] + rotationArray[i+1])/3);
-//			if (rotationArray[i-2 +extender]+15 > currentCenter && currentCenter < rotationArray[i+2]+15) {
-//				peak = i;
-//				break;
-//			}
-			
-//			if (rotationArray[i-2 %72]+20 > rotationArray[i] && rotationArray[i-1 %72] > rotationArray[i]
-//					&& rotationArray[i] < rotationArray[i+1] && rotationArray[i] < rotationArray[i+2]+20) {
-//				peak = i;
-//				break;
-//			}
 		}
-		return peak;
+		for(int k = i; k < angleSegment+i; k++) {
+			if(rotationArray[(k+72)%72] ==255 || rotationArray[(k+73)%72] ==255 ) continue;
+			if(rotationArray[k+1] - rotationArray[k] > 15) {
+				foundRightJump = true;
+				break;
+			}
+		}
+		if(foundLeftJump && foundRightJump) {
+			return true;
+		} else return false;
+	}
+	
+	static int[] preciseScan(int[] rotationArray) {
+		UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
+		int measured=0;
+		rotationArray= new int[82];
+		for (int i=0; i < 72; i++) {
+
+			int numValidMeasurements = 0;
+			for(int j = 0; j<5; j++) {
+				measured = us.getDistance();
+				//Delay.msDelay(80);
+				if (measured != 255) {
+					rotationArray[i] += measured;
+					numValidMeasurements++;
+				}
+			}
+			if(numValidMeasurements == 0) {
+				rotationArray[i] = measured;
+			} else {
+				rotationArray[i] = (int) (measured/numValidMeasurements);
+			}
+			pilot.rotate(5);				// 5 degrees left
+			while(pilot.isMoving()) Thread.yield();
+		}
+		return rotationArray;
 	}
 	
 	static boolean drive(int distance) {
@@ -249,6 +262,7 @@ public class Main {
 
 		int peakRot;  //rotation direction of supposed can position
 		int peakDist; //distance to supposed can position
+		line = false;
 		
 		while(true){
 			if (line) avoidLine();
@@ -392,25 +406,29 @@ public class Main {
 			System.out.println("         A " + peakDist);
 			if(drive(300))return false;
 		}
-		else if(peakDist > 45) {
+		else if(peakDist > 22) {
 
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			System.out.println("         A " + peakDist);
 			if(drive((peakDist-20)*10))return false;
+		} else {
+			
 			Motor.C.setSpeed(50);
+			Motor.C.setStallThreshold(2, 100);
 			Motor.C.stop();
 			Motor.C.rotateTo(90);			//open claw
-			Delay.msDelay(4000);
+			while(!Motor.C.isStalled()){
+				Delay.msDelay(10);
+			}
 			UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
 			while(us.getDistance()>6) {		//drive to can stopping 5 cm in front of u.s.sensor
 				if(drive(10)) return false;
 			}
 				
-			
+			Motor.C.stop();
 			Motor.C.rotateTo(-25);			//close claw
 			Motor.C.setSpeed(20);
-			Motor.C.setStallThreshold(2, 100);
 			Motor.C.rotateTo(-90);
 			while(!Motor.C.isStalled()){
 				Delay.msDelay(10);
@@ -420,6 +438,7 @@ public class Main {
 			grabbedCan = true;			//can now grabbed
 			Sound.playNote(Sound.FLUTE, 1500, 1000);
 			System.out.println("         C " + peakDist);
+		}
 //		} else if(peakDist > 20){
 //			Sound.playNote(Sound.FLUTE, 1000, 1000);
 //			System.out.println("         B " + peakDist);
@@ -443,8 +462,6 @@ public class Main {
 //			Sound.playNote(Sound.FLUTE, 1500, 1000);
 //			System.out.println("         C " + peakDist);
 //		}
-		
-		} else return false;
 			
 		while(pilot.isMoving())Thread.yield();
 		return grabbedCan;
