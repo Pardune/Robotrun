@@ -37,63 +37,74 @@ public class ObjectsPardune {
 		// if: corner(pos to neg): continue
 		// else: retreive dose (pos to neg to pos)
 
-		// put first measurement value, therfor the for-loop wont change
-		measurements[0] = ultrasonicSensor.getDistance();
 		// fill measurments and diff-array via loop
-		int numValidMeasurements = 1;
-		for (int i=0; i < 72; i++) {
+		int numValidMeasurements = 0;
+		for (i=0; i < 72; i++) {
 			for(int j = 0; j<5; j++) {
+				numValidMeasurements = 0;
 				measured = ultrasonicSensor.getDistance();
 				if (measured != 255) {
-					measured += measured;
+					measurements[i] += measured;
 					numValidMeasurements++;
-					Delay.msDelay(80);
-				}
-			}
-			measurements[i] = (int) (measured/numValidMeasurements);
-			pilot.rotate(5);				// 5 degrees left
-		}
 
-		// process diff-Array
-		for (int i = 0; i<72;i++){
-			differenceBetweenVals[i] = measurements[i] - measurements[i+1];
-		}
-
-		// print diff-array
-		for (int i = 0; i<72;i++){
-			if((i+1)%10 == 0){					// every tenth value, enter new line
-				System.out.println();
-			}
-			System.out.print(differenceBetweenVals[i]+ ",");
-		}
-
-		// all measurements done, evaluate differences
-		boolean distanceIncreasing = (differenceBetweenVals[0] >= 0) ? true : false ;
-		if (distanceIncreasing){
-			// search first increase in distance
-			for(i = 0; i<differenceBetweenVals.length; i++){	// for each int in array, save value in diff
-				if (differenceBetweenVals[i] < 0 && differenceBetweenVals[i] > 15){
-					System.out.println("feature at: " +i);
 				}
-			}
-		} else {
-			// search first decrease in distance
-			for(i = 0; i<differenceBetweenVals.length; i++){
-				if (differenceBetweenVals[i] >= 0 && differenceBetweenVals[i] > 15){
-					System.out.println("feature at: " + i);
+				if(numValidMeasurements == 0) {
+					measurements[i] = measured;
+				} else {
+					measurements[i] = (int) (measured/numValidMeasurements);
 				}
+				pilot.rotate(5);				// 5 degrees left
+				while(pilot.isMoving()) Thread.yield();
 			}
-		}	// if ende
+
+			// process diff-Array
+			for (int k = 0; k<71; k++){
+				differenceBetweenVals[k] = measurements[k] - measurements[k+1];
+			}
+
+			// print diff-array
+			for (int k = 0; k<72;k++){
+				if((k+1)%10 == 0){					// every tenth value, enter new line
+					System.out.println();
+				}
+				System.out.print(differenceBetweenVals[k]+ ",");
+			}
+
+			// all measurements done, evaluate differences
+			boolean distanceIncreasing = (differenceBetweenVals[0] >= 0) ? true : false ;
+			if (distanceIncreasing){
+				// search first decrease in distance
+				for(i = 0; i<differenceBetweenVals.length; i++){	// for each int in array, save value in diff
+					if (differenceBetweenVals[i] < 0 && differenceBetweenVals[i] > 15){
+						System.out.println("feature at: " +i);
+					}
+				}
+			} else {
+				// search first decrease in distance
+				for(i = 0; i<differenceBetweenVals.length; i++){
+					if (differenceBetweenVals[i] >= 0 && differenceBetweenVals[i] > 15){
+						System.out.println("feature at: " + i);
+					}
+				}
+			}	// if ende
+
+			// rotiere zum peak
+			if(i>36){
+				pilot.rotate((72-i)*5);
+			} else{
+				pilot.rotate(i*5);
+			}
+
+			// gib distanz aus
+			System.out.println("distance to feature: " + measurements[i]);
+			System.out.println("Index ist: " + i); 
+		}
+	}
+	
+	public void findPodestPar(int vals){
+		measurements = new int[vals];
+		pilot.rotate((vals-1)/2);
 		
-		// rotiere zum peak
-		if(i>36){
-			pilot.rotate((72-i)*5);
-		} else{
-			pilot.rotate(i*5);
-		}
-		
-		// gib distanz aus
-		System.out.println("distance to feature: " + measurements[i]);
 	}
 	
 	public int getPeak(){
