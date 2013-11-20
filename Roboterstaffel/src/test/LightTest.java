@@ -7,6 +7,11 @@ import lejos.nxt.UltrasonicSensor;
 import lejos.robotics.navigation.DifferentialPilot;
 import lejos.util.Delay;
 
+/**
+ * Provides miscellaneous methods for line detecting and handling.
+ * @author Anton Komarov, Stefan Schuler
+ * @version 2.0
+ */
 public class LightTest {
 	static DifferentialPilot pilot = new DifferentialPilot(43.2f, 161f, Motor.A, Motor.B, false);
 	static LightSensor light = new LightSensor(SensorPort.S1);
@@ -15,34 +20,29 @@ public class LightTest {
 	static int floor;
 	static int line;
 	
+	/**
+	 * Has not further role, only for testing. Other methods are static and executed via main/main2 classes
+	 * @param args void
+	 */
 	public static void main(String[] args) {
 		
-		//findWhitePaper();
 		while (true) {
 			checkLightValue();
 		}
 		//followLine();
-		//getOnLine();
-		//driveOnLine();
-		/*if (isLineLeft()== true ) {
-			Delay.msDelay(2000);
-			Sound.beep();
-		}
-		Delay.msDelay(5000);
-		if (isLineRight() == true) {
-			Delay.msDelay(2000);
-			Sound.beep();
-			Delay.msDelay(500);
-			Sound.beep();
-		}*/
-		//Delay.msDelay(1000);
 	}
 	
+	/**
+	 * Sets the pilot to "regular" acceleration
+	 */
 	public static void setPilot() {
 		pilot.setAcceleration(60);
 	}
 	
-	public static void setLineValue(){
+	/**
+	 * Evaluates the light value of the line depending on the current light value (floor at this time)
+	 */
+	public static void setLineValue() {
 		
 		floor = light.getLightValue();
 		floor = light.getLightValue();
@@ -50,34 +50,20 @@ public class LightTest {
 		line = floor + 5;
 	}
 	
+	/**
+	 * Measures the current raw light value and prints it on the NXTs screen
+	 */
 	public static void getRawValue() {
 		System.out.println("          " + light.readNormalizedValue());
 		Delay.msDelay(1000);
 	}
 	
-	/*public static void driveOnLine (){ //precondition: robot is in the line
-		while (true) {
-			boolean lineOnLeft = isLineLeft();
-			boolean lineOnRight = isLineRight();
-			if (!lineOnLeft && !lineOnRight) {
-				pilot.travel(100);
-			}
-			else if (lineOnLeft) {
-				pilot.rotate(20);
-				pilot.travel(50);
-			}
-			else if (lineOnRight) {
-				pilot.rotate(-20);
-				pilot.travel(50);
-			}
-			if (dist.getDistance() < 50) {
-				pilot.rotate(180);
-				return;
-			}
-		}
-	}*/
-	
-	public static boolean isLineRight() { //precondition: line is in front of robot
+	/**
+	 * Checks if the line is on the right side (45 degree angle) of the robot
+	 * Precondition: line is in front of robot
+	 * @return true, if line is right. false, if not.
+	 */
+	public static boolean isLineRight() { 
 		int lightAtStart;
 		int lightRight;
 		
@@ -95,7 +81,12 @@ public class LightTest {
 		else return true;
 	}
 	
-	public static boolean isLineLeft() { //precondition: line is in front of roboter
+	/**
+	 * Checks if the line is on the left side (45 degree angle) of the robot
+	 * Precondition: line is in front of robot
+	 * @return true, if line is left. false, if not.
+	 */
+	public static boolean isLineLeft() { 
 		int lightAtStart;
 		int lightLeft;
 		
@@ -112,11 +103,19 @@ public class LightTest {
 		else return false;
 	}
 	
+	/**
+	 * Measures the current light value (0-100) and prints it on the NXTs screen
+	 */
 	public static void checkLightValue() {
 		System.out.println("          " + light.getLightValue());
 		Delay.msDelay(1000);
 	}
 	
+	/**
+	 * Follows the line till there is an obstacle(wall), then stops. Then rotates if input value is true.
+	 * Precondition: Robot is able to spot the line with the light sensor.
+	 * @param turnAtEnd true, if robot has to rotate (180 degree) at the end. false, if no rotation.
+	 */
 	public static void followLine(boolean turnAtEnd) {
 		
 		pilot.setAcceleration(60);
@@ -161,26 +160,12 @@ public class LightTest {
 		}
 
 	}
-
-	public static void getOnLine() {
-		pilot.travel(1000,true);
-
-		Thread testLight = new Thread() {
-			public void run() {
-				while (true) {
-					if (light.getLightValue() > line) {
-						pilot.setAcceleration(1000);
-						pilot.stop();
-						pilot.setAcceleration(60);
-						handleLine(false);
-						return;
-					}
-				}
-			}
-		};
-		testLight.start();
-	}
 	
+	/**
+	 * Checks if the line is on the left or the right of the robot. Then turns in appropriate angle and starts followLine().
+	 * 
+	 * @param turn Handed to followLine(), specifies if robot turns at the wall.
+	 */
 	public static void handleLine(boolean turn) {
 		boolean left = isLineLeft();
 		boolean right = isLineRight();
