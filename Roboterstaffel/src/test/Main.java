@@ -48,7 +48,7 @@ public class Main {
 			
 			i = sortArray[c]; //get rotationArray index in order of c
 			
-			if(rotationArray[i]>170) continue; 			// don't choose peak that's further away than 80 cm
+			if(rotationArray[i]>170) continue; 			// don't choose peak that's further away than 170 cm
 			
 			//###
 			
@@ -60,7 +60,7 @@ public class Main {
 					break;
 				}
 			}
-			else if(rotationArray[i]>45) {	//search above distance of 45 for peak because smaller distances are not as precise
+			else if(rotationArray[i]>25) {	//search above distance of 45 for peak because smaller distances are not as precise
 				if(jumpFinder(rotationArray, 7, i)) {
 					peak = i;
 					break;
@@ -75,21 +75,6 @@ public class Main {
 					// put first measurement value, therfor the for-loop wont change
 					
 					// fill measurments and diff-array via loop
-					
-					rotationArray = preciseScan(rotationArray);
-					
-					sortArray = arraySort(rotationArray);
-					for(c = 0; c < 72; c++) {
-						
-						i = sortArray[c]; //get rotationArray index in order of c
-						
-						if(rotationArray[i]>170) continue; 			// don't choose peak that's further away than 80 cm
-						if(jumpFinder(rotationArray, 8, i)) {
-							peak = i;
-						}
-					
-					}
-					break;
 				}
 			}
 		}
@@ -155,7 +140,6 @@ public class Main {
 			int numValidMeasurements = 0;
 			for(int j = 0; j<5; j++) {
 				measured = us.getDistance();
-				//Delay.msDelay(80);
 				if (measured != 255) {
 					rotationArray[i] += measured;
 					numValidMeasurements++;
@@ -223,18 +207,18 @@ public class Main {
 		LightTest.setPilot();
 		Button.waitForAnyPress();
 		LightTest.setLineValue();
-		CommMaster nxt = new CommMaster();
+		//CommMaster nxt = new CommMaster();
 		while (true) {
 			liftClaw();
 			mainAlgorithm(pilot); //searching pedestal and grabbing the can, then drive to the line
 			LightTest.handleLine(true);
 			turnOfUltrasonic();
-			nxt.sendReady();
-			nxt.waitForAnswer();
+			//nxt.sendReady();
+			//nxt.waitForAnswer();
 			Delay.msDelay(10000);
 			releaseCan();
 			returnToField();
-			nxt.waitForAnswer();
+			//nxt.waitForAnswer();
 		}		
 	}
 	
@@ -410,9 +394,19 @@ public class Main {
 
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
-			System.out.println("         A " + peakDist);
+			System.out.println("         B " + peakDist);
 			if(drive((peakDist-20)*10))return false;
-		} else {
+
+			int[] rotationArray = new int[82];
+			rotationArray = preciseScan(rotationArray);
+			
+			int[] sortArray = arraySort(rotationArray);
+			int peak = sortArray[0]; //get rotationArray index in order of c
+			Sound.playNote(Sound.FLUTE, 500, 1000);
+			Sound.playNote(Sound.FLUTE, 500, 1000);
+			Sound.playNote(Sound.FLUTE, 500, 1000);
+			System.out.println("         C " + peakDist);
+			rotate(peak*5);
 			
 			Motor.C.setSpeed(50);
 			Motor.C.setStallThreshold(2, 100);
