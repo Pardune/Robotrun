@@ -1,44 +1,36 @@
 package pardune;
 
-/**
- * this programm sends data to a slave
- * it's used to tell the other robot waht to do
- * 
- */
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
-
 import javax.bluetooth.RemoteDevice;
-
-import lejos.nxt.Motor;
 import lejos.nxt.comm.BTConnection;
 import lejos.nxt.comm.Bluetooth;
-import lejos.robotics.navigation.DifferentialPilot;
 
+/**
+ * this programm sends data to a slave
+ * it's used to tell the other robot what to do
+ *
+ */
 public class CommMaster {
-	// fields for constuctor CommMaster()
 	DataOutputStream dos;
 	DataInputStream dis;
 	BTConnection btc;
 	RemoteDevice btrd;
 	String remoteName = "NXT";
 	
-	// fields for sendData()
-	int data;
+	//int data;
 
+	/**
+	 * Establishes a connection to slave robot named by class field "remoteName". Then opens input and output
+	 * streams.
+	 */
 	public CommMaster() {
 		try {
-			// setup for pcToSource()
-			//btc = Bluetooth.waitForConnection();
-					
-			// setup for nxtToNxt()
 			btrd = Bluetooth.getKnownDevice(remoteName);
-			System.out.println("      " + 123);
+			//System.out.println("      " + 123);
 			btc = Bluetooth.connect(btrd);
-			System.out.println("      " + 345);
-			// setup end
+			//System.out.println("      " + 345);
 			dos = btc.openDataOutputStream();
 			dis = btc.openDataInputStream();
 		} catch (Exception e) {
@@ -47,6 +39,9 @@ public class CommMaster {
 		}
 	}
 	
+	/**
+	 * Blocks till other robot sends a 1 (is ready).
+	 */
 	public void waitForAnswer() {
 		try {
 			while (dis.readInt() != 1) {
@@ -58,6 +53,9 @@ public class CommMaster {
 		}
 	}
 	
+	/**
+	 * Sends a 1 to the other robot, to tell him to go on.
+	 */
 	public void sendReady() {
 		try {
 			dos.writeInt(1);
@@ -67,7 +65,7 @@ public class CommMaster {
 			e.printStackTrace();
 		}
 	}
-	
+/*	
 	public int sendData(int data){
 		try {
 			dos.writeInt(data);
@@ -78,8 +76,11 @@ public class CommMaster {
 		}
 		
 		return 0;
-	}
+	}*/
 	
+	/**
+	 * Closes input and output stream of the connection.
+	 */
 	public void end() {
 		try {
 			// obligatory
