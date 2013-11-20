@@ -56,7 +56,7 @@ public class ObjectsPardune {
 
 		// process diff-Array
 		for (int i = 0; i<72;i++){
-			differenceBetweenVals[i]= measurements[i] - measurements[i+1];
+			differenceBetweenVals[i] = measurements[i] - measurements[i+1];
 		}
 
 		// print diff-array
@@ -79,7 +79,7 @@ public class ObjectsPardune {
 		} else {
 			// search first decrease in distance
 			for(i = 0; i<differenceBetweenVals.length; i++){
-				if (diff >= 0 && differenceBetweenVals[i] > 15){
+				if (differenceBetweenVals[i] >= 0 && differenceBetweenVals[i] > 15){
 					System.out.println("feature at: " + i);
 				}
 			}
@@ -94,5 +94,9 @@ public class ObjectsPardune {
 		
 		// gib distanz aus
 		System.out.println("distance to feature: " + measurements[i]);
+	}
+	
+	public int getPeak(){
+		return measurements[i];
 	}
 }

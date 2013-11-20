@@ -14,10 +14,10 @@ import lejos.util.Delay;
 import java.lang.Math;
 
 public class Main {
-	
+
 	static DifferentialPilot pilot = new DifferentialPilot(43.2f, 160f, Motor.A, Motor.B, false);
 	static boolean line = false;
-	
+
 	/**
 	 * @param args
 	 */
@@ -33,65 +33,59 @@ public class Main {
 			}
 		}
 		System.out.println("          " + rotationArray[maxDistanceRot]);
-		
+
 		return maxDistanceRot;
-		
-		
+
+
 	}
-	
+
 	static int findPeak(int[] rotationArray) {
 
 		int[] sortArray = arraySort(rotationArray);
 		int peak = -1000; //returned if no peak found
 		int i; //lowest unchecked distance
 		for(int c = 0; c < 72; c++) {
-			
+
 			i = sortArray[c]; //get rotationArray index in order of c
-			
+
 			if(rotationArray[i]>170) continue; 			// don't choose peak that's further away than 170 cm
-			
+
 			//###
-			
-			
-			
+
+
+
 			if(rotationArray[i]>50) {
 				if(jumpFinder(rotationArray, 5, i)) {
 					peak = i;
 					break;
 				}
 			}
-			else if(rotationArray[i]>25) {	//search above distance of 45 for peak because smaller distances are not as precise
+			else if(rotationArray[i]>30) {	//search above distance of 30 for peak because smaller distances are not as precise
 				if(jumpFinder(rotationArray, 7, i)) {
 					peak = i;
 					break;
 				}
 			} else {
 				if(jumpFinder(rotationArray, 8, i)) {
-					
-					// measure, compare difference
-					// if: corner(pos to neg): continue
-					// else: retreive dose (pos to neg to pos)
-	
-					// put first measurement value, therfor the for-loop wont change
-					
-					// fill measurments and diff-array via loop
+					peak = i;
+					break;
 				}
 			}
 		}
 		return peak;
 	}
-	
+
 	static int[] arraySort(int[] rotationArray) {
 		int temp1;		//rotationArray temp
 		int temp2;		//sortArray temp
 		int[] rotationArray2 = rotationArray.clone(); 	//duplicate to sort distances in increasing order
 		int[] sortArray = new int[72];			//array index links to corresponding (increasing) distances in rotation Array
-												//e.g. biggest distance -> rotationArray[sortArray[0]]
-		
+		//e.g. biggest distance -> rotationArray[sortArray[0]]
+
 		for(int i=0; i<sortArray.length; i++) {
 			sortArray[i]=i;						//create increasingly ordered array -> ["0,0";"1,1";"2,2";... ] 
 		}
-		
+
 		for(int i=1; i<sortArray.length; i++) {			//bubble sort - sorted after distances contained in rotationArray2
 			for(int j=0; j<sortArray.length-i; j++) {
 				if(rotationArray2[j]>rotationArray2[j+1]) {
@@ -102,12 +96,12 @@ public class Main {
 					rotationArray2[j+1]=temp1;
 					sortArray[j+1]=temp2;
 				}
-				
+
 			}
 		}
 		return sortArray;
 	}
-	
+
 	static boolean jumpFinder(int[] rotationArray, int angleSegment, int i) {
 
 		boolean foundLeftJump = false;
@@ -130,7 +124,7 @@ public class Main {
 			return true;
 		} else return false;
 	}
-	
+
 	static int[] preciseScan(int[] rotationArray) {
 		UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
 		int measured=0;
@@ -155,7 +149,7 @@ public class Main {
 		}
 		return rotationArray;
 	}
-	
+
 	static boolean drive(int distance) {
 		line = false;
 		LightSensor light = new LightSensor(SensorPort.S1);
@@ -172,7 +166,7 @@ public class Main {
 		}
 		return line;
 	}
-	
+
 	static boolean rotate(int angle) {
 		line = false;
 		LightSensor light = new LightSensor(SensorPort.S1);
@@ -199,7 +193,7 @@ public class Main {
 		}
 		Motor.C.stop();
 	}
-	
+
 	public static void main(String[] args) {
 		Delay.msDelay(10000);
 		pilot.setAcceleration(50); //30 if floor slippery
@@ -221,17 +215,17 @@ public class Main {
 			//nxt.waitForAnswer();
 		}		
 	}
-	
+
 	public static void turnOfUltrasonic() {
 		UltrasonicSensor ultra = new UltrasonicSensor(SensorPort.S4);
 		ultra.off();
 	}
-	
+
 	public static void returnToField() {
 		pilot.rotate(-90);
 		pilot.travel(150);
 	}
-	
+
 	private static void releaseCan() {
 		Motor.C.setSpeed(20);
 		Motor.C.setStallThreshold(2, 100);
@@ -247,14 +241,14 @@ public class Main {
 		int peakRot;  //rotation direction of supposed can position
 		int peakDist; //distance to supposed can position
 		line = false;
-		
+
 		while(true){
 			if (line) avoidLine();
-			
+
 			int[] rotationArray = rotateNscan(); //get array with distance values
-			
+
 			peakRot = findPeak(rotationArray);	//find angle in which the pedestal possible is (distance peak)	
-			
+
 			if (peakRot == -1000) {					//no peak found, error handling -> avoid obstacle (try again later)
 
 				int angle = findMaxDistance(rotationArray); 
@@ -265,12 +259,12 @@ public class Main {
 				} else {
 					optimAngle = angle-72;	//rotate left
 				}
-				
+
 				if(rotate(optimAngle*5)) {						//robot ended on line, undo rotation
 					pilot.rotate(-pilot.getAngleIncrement());
 					continue;
 				}
-				
+
 				Sound.setVolume(100);
 				Sound.playNote(Sound.FLUTE, 1500, 1000);
 				Sound.playNote(Sound.FLUTE, 1500, 1000);
@@ -279,7 +273,7 @@ public class Main {
 				} else if(rotationArray[angle]>50) {	//TODO comment
 					drive(300);
 				} else {
-				drive((rotationArray[angle]-15)*10);	//TODO comment
+					drive((rotationArray[angle]-15)*10);	//TODO comment
 				}
 				continue;						//start turning and measuring again
 			}
@@ -298,42 +292,42 @@ public class Main {
 			}
 		};
 		thread1.start();
-		
+
 		UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
-			int[] rotationArray = new int[81];
+		int[] rotationArray = new int[81];
 
-			for(int rotation = 0; rotation < 72; rotation++ ) {
-				while (rotation*5 > pilot.getAngleIncrement()) { //every 5°
-					Delay.msDelay(1);
-				}
-				rotationArray[rotation]=us.getDistance();		 //save distance
-//				Sound.playNote(Sound.FLUTE, 3000 - (20*rotationArray[rotation]), 10);
-				System.out.println("          " + rotationArray[rotation]);
-		
+		for(int rotation = 0; rotation < 72; rotation++ ) {
+			while (rotation*5 > pilot.getAngleIncrement()) { //every 5°
+				Delay.msDelay(1);
 			}
-		
-//		int[] rotationArray = new int[81];
-//		UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
-//		int a;
-//		int b;
-//		for (int i=1; i < 72; i++){
-//			
-//			while(pilot.isMoving()) Thread.yield();
-//			a = us.getDistance();
-//			b = us.getDistance();
-//			if(a == 255) {
-//				rotationArray[i] = b;
-//			} else if(b == 255) {
-//				rotationArray[i] = a;
-//			} else {
-//				rotationArray[i] = (int) (a+b)/2;
-//			}
-//			System.out.println("          " + rotationArray[i]);
-//			Delay.msDelay(160);				// since ultrasonic sensor needs 75ms between readings
-//			pilot.rotate(5);				// 5 degrees left
+			rotationArray[rotation]=us.getDistance();		 //save distance
+			//				Sound.playNote(Sound.FLUTE, 3000 - (20*rotationArray[rotation]), 10);
+			System.out.println("          " + rotationArray[rotation]);
 
-//		}
-		
+		}
+
+		//		int[] rotationArray = new int[81];
+		//		UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
+		//		int a;
+		//		int b;
+		//		for (int i=1; i < 72; i++){
+		//			
+		//			while(pilot.isMoving()) Thread.yield();
+		//			a = us.getDistance();
+		//			b = us.getDistance();
+		//			if(a == 255) {
+		//				rotationArray[i] = b;
+		//			} else if(b == 255) {
+		//				rotationArray[i] = a;
+		//			} else {
+		//				rotationArray[i] = (int) (a+b)/2;
+		//			}
+		//			System.out.println("          " + rotationArray[i]);
+		//			Delay.msDelay(160);				// since ultrasonic sensor needs 75ms between readings
+		//			pilot.rotate(5);				// 5 degrees left
+
+		//		}
+
 		rotationArray[72]=rotationArray[0];		//let measurements overlap
 		rotationArray[73]=rotationArray[1];
 		rotationArray[74]=rotationArray[2];
@@ -350,13 +344,13 @@ public class Main {
 		pilot.rotate(180);
 		pilot.travel(500);
 	}
-	
+
 	public static void findLine() {
 		while(true) {
 			int[] rotationArray = rotateNscan();
 			int angle = findMaxDistance(rotationArray);
 			int optimAngle;
-			
+
 			if(angle < 36) {
 				optimAngle = angle;
 			} else {
@@ -383,7 +377,7 @@ public class Main {
 			pilot.rotate(-pilot.getAngleIncrement());
 			return false;
 		};					
-		
+
 		if(peakDist > 82) {							
 
 			Sound.playNote(Sound.FLUTE, 300, 1000);
@@ -399,7 +393,7 @@ public class Main {
 
 			int[] rotationArray = new int[82];
 			rotationArray = preciseScan(rotationArray);
-			
+
 			int[] sortArray = arraySort(rotationArray);
 			int peak = sortArray[0]; //get rotationArray index in order of c
 			Sound.playNote(Sound.FLUTE, 500, 1000);
@@ -407,7 +401,7 @@ public class Main {
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			System.out.println("         C " + peakDist);
 			rotate(peak*5);
-			
+
 			Motor.C.setSpeed(50);
 			Motor.C.setStallThreshold(2, 100);
 			Motor.C.stop();
@@ -419,7 +413,7 @@ public class Main {
 			while(us.getDistance()>6) {		//drive to can stopping 5 cm in front of u.s.sensor
 				if(drive(10)) return false;
 			}
-				
+
 			Motor.C.stop();
 			Motor.C.rotateTo(-25);			//close claw
 			Motor.C.setSpeed(20);
@@ -428,37 +422,37 @@ public class Main {
 				Delay.msDelay(10);
 			}
 			Motor.C.stop();
-//			Delay.msDelay(4000);		//wait to ensure claw closure
+			//			Delay.msDelay(4000);		//wait to ensure claw closure
 			grabbedCan = true;			//can now grabbed
 			Sound.playNote(Sound.FLUTE, 1500, 1000);
 			System.out.println("         C " + peakDist);
 		}
-//		} else if(peakDist > 20){
-//			Sound.playNote(Sound.FLUTE, 1000, 1000);
-//			System.out.println("         B " + peakDist);
-//			if(drive((peakDist - 15)*10))return false;
-//		} else {						//can near enough to be grabbed
-//			
-//			Motor.C.setSpeed(50);
-//			Motor.C.rotateTo(50);			//open claw
-//			Delay.msDelay(4000);
-//			drive(Math.abs((peakDist - 4)*10));	//drive to can stopping 10 cm in front of u.s.sensor
-//			Motor.C.rotateTo(-25);			//close claw
-//			Motor.C.setSpeed(20);
-//			Motor.C.setStallThreshold(2, 100);
-//			Motor.C.rotateTo(-90);
-//			while(!Motor.C.isStalled()){
-//				Delay.msDelay(10);
-//			}
-//			Motor.C.stop();
-////			Delay.msDelay(4000);		//wait to ensure claw closure
-//			grabbedCan = true;			//can now grabbed
-//			Sound.playNote(Sound.FLUTE, 1500, 1000);
-//			System.out.println("         C " + peakDist);
-//		}
-			
+		//		} else if(peakDist > 20){
+		//			Sound.playNote(Sound.FLUTE, 1000, 1000);
+		//			System.out.println("         B " + peakDist);
+		//			if(drive((peakDist - 15)*10))return false;
+		//		} else {						//can near enough to be grabbed
+		//			
+		//			Motor.C.setSpeed(50);
+		//			Motor.C.rotateTo(50);			//open claw
+		//			Delay.msDelay(4000);
+		//			drive(Math.abs((peakDist - 4)*10));	//drive to can stopping 10 cm in front of u.s.sensor
+		//			Motor.C.rotateTo(-25);			//close claw
+		//			Motor.C.setSpeed(20);
+		//			Motor.C.setStallThreshold(2, 100);
+		//			Motor.C.rotateTo(-90);
+		//			while(!Motor.C.isStalled()){
+		//				Delay.msDelay(10);
+		//			}
+		//			Motor.C.stop();
+		////			Delay.msDelay(4000);		//wait to ensure claw closure
+		//			grabbedCan = true;			//can now grabbed
+		//			Sound.playNote(Sound.FLUTE, 1500, 1000);
+		//			System.out.println("         C " + peakDist);
+		//		}
+
 		while(pilot.isMoving())Thread.yield();
 		return grabbedCan;
-		
+
 	}
 }
