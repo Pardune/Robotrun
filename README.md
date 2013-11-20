@@ -3,8 +3,20 @@ Robotrun
 
 Hardwarepraktikum der Gruppe B4.6 &amp; B5.3
 
+Team
+gut:
+-freies Arbeiten der Mitglieder
+-
+
+"nicht so gut":
+-Problembesprechung und Lösungsansätze individuell
+-kein Teamleiter
+-unkoordiniertes Vorgehen, peu à peu
+->unterschiedliche Arbeitsleistung
+
+
 Hardware
--zwei Roboter
+-zwei baugleiche Roboter
 -breite Reifen
 -greifarm, der auch anhebt
 -gefühlt große Spurbreite
@@ -21,11 +33,11 @@ bestätigte
 -miese Sensorwerte
 -Raum wird unregelmäßig geschlossen
 
-
 unbestätigte
--Raum aufschließen lassen
+-in den Raum gelangen
 -geringe Fahrpräzision der Roboter
 
 aufgetretene
 -Terminfindung, da unterschiedliche Stundenpläne
 -Ultraschallsensor misst Boden, wenn zu niedrig angebracht
+-Roboter behindert Messungen
