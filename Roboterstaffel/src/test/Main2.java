@@ -35,7 +35,7 @@ public class Main2 {
 		
 		return maxDistanceRot;
 		
-	}
+	}	
 	
 	static int findPeak(int[] rotationArray) {
 		int temp1;		//rotationArray temp
@@ -77,14 +77,14 @@ for(int c = 0; c < 72; c++) {
 			
 			if(rotationArray[i]>50) {
 				for(int k = -5+i; k < i; k++) {
-					if(rotationArray[(k+72)%72] >230 || rotationArray[(k+73)%72] >230 ) continue;
+					if(rotationArray[(k+72)%72] ==255 && rotationArray[(k+73)%72] >50) continue;
 					if(rotationArray[(k+72)%72] - rotationArray[(k+73)%72] > 20) {
 						foundLeftJump = true;
 						break;
 					}
 				}
 				for(int k = i; k < 5+i; k++) {
-					if(rotationArray[(k+72)%72] >230 || rotationArray[(k+73)%72] >230 ) continue;
+					if(rotationArray[k+1] ==255 && rotationArray[k] >50 ) continue;
 					if(rotationArray[k+1] - rotationArray[k] > 20) {
 						foundRightJump = true;
 						break;
@@ -93,14 +93,14 @@ for(int c = 0; c < 72; c++) {
 			}
 			else if(rotationArray[i]>30) {
 				for(int k = -7+i; k < i; k++) {
-					if(rotationArray[(k+72)%72] >230 || rotationArray[(k+73)%72] >230 ) continue;
+					if(rotationArray[(k+72)%72] ==255 && rotationArray[(k+73)%72] >50) continue;
 					if(rotationArray[(k+72)%72] - rotationArray[(k+73)%72] > 20) {
 						foundLeftJump = true;
 						break;
 					}
 				}
 				for(int k = i; k < 7+i; k++) {
-					if(rotationArray[(k+72)%72] >230 || rotationArray[(k+73)%72] >230 ) continue;
+					if(rotationArray[k+1] ==255 && rotationArray[k] >50 ) continue;
 					if(rotationArray[k+1] - rotationArray[k] > 20) {
 						foundRightJump = true;
 						break;
@@ -108,14 +108,14 @@ for(int c = 0; c < 72; c++) {
 				}
 			} else {
 				for(int k = -8+i; k < i; k++) {
-					if(rotationArray[(k+72)%72] >230 || rotationArray[(k+73)%72] >230 ) continue;
+					if(rotationArray[(k+72)%72] ==255 && rotationArray[(k+73)%72] >50) continue;
 					if(rotationArray[(k+72)%72] - rotationArray[(k+73)%72] > 20) {
 						foundLeftJump = true;
 						break;
 					}
 				}
 				for(int k = i; k < 8+i; k++) {
-					if(rotationArray[(k+72)%72] >230 || rotationArray[(k+73)%72] >230 ) continue;
+					if(rotationArray[k+1] ==255 && rotationArray[k] >50 ) continue;
 					if(rotationArray[k+1] - rotationArray[k] > 20) {
 						foundRightJump = true;
 						break;
