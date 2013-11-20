@@ -17,7 +17,7 @@ public class Main {
 	static DifferentialPilot pilot = new DifferentialPilot(43.2f, 160f, Motor.A, Motor.B, false);
 	static boolean line = false;
 	
-	b//Ich hoffe man kann meine Kommentare verstehen, leider funktioniert der Müll noch nicht so recht...
+	//Ich hoffe man kann meine Kommentare verstehen, leider funktioniert der Müll noch nicht so recht...
 	/**
 	 * @param args
 	 */

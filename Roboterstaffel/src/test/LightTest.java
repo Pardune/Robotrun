@@ -144,7 +144,7 @@ public class LightTest {
 					if (dist.getDistance() < 20) { //wall found, going into position and return
 						pilot.setAcceleration(1000);
 						pilot.stop();
-						pilot.rotate(180);
+						pilot.rotate(175);
 						pilot.setAcceleration(60);
 						return;
 					}
