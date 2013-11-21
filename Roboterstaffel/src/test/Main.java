@@ -21,15 +21,17 @@ public class Main {
 	/**
 	 * @param args
 	 */
+
 	static int findMaxDistance(int[] rotationArray) {	//calculate to biggest distance, makes collisions unlikely but still possible
 		int maxDistance = 0;							//robot should drive into the center to ease can detection -> then handle line (avoid or drive onto it)
 		int maxDistanceRot = 0;
-		for(int i = 0; i < 72; i++) {
-			int newDistance = rotationArray[i] + rotationArray[i+1] + rotationArray[i+2] + rotationArray[i+3]		//possibly to many values -> wrong directions & higher collision danger?
-					+ rotationArray[i+4] + rotationArray[i+5] + rotationArray[i+6]+ rotationArray[i+7] + rotationArray[i+8];
+		int start = (int) (Math.random()*72);
+		for(int i = start; i < i+72; i++) {
+			int newDistance = rotationArray[(i+72)%72] + rotationArray[(i+73)%72] + rotationArray[(i+74)%72] + rotationArray[(i+75)%72]		//possibly to many values -> wrong directions & higher collision danger?
+					+ rotationArray[(i+76)%72] + rotationArray[(i+77)%72] + rotationArray[(i+78)%72]+ rotationArray[(i+79)%72] + rotationArray[(i+80)%72];
 			if(newDistance > maxDistance) {
 				maxDistance = newDistance;
-				maxDistanceRot = i+4;
+				maxDistanceRot = (i+76)%72;;
 			}
 		}
 		System.out.println("          " + rotationArray[maxDistanceRot]);
@@ -179,7 +181,7 @@ public class Main {
 			while(pilot.isMoving()) Thread.yield();
 		}
 		while(value < 30);
-		pilot.rotate(-rightEdge);
+		pilot.rotate(-leftEdge);
 		while(pilot.isMoving()) Thread.yield();
 		return(leftEdge+rightEdge);
 		
@@ -319,15 +321,18 @@ public class Main {
 			mainAlgorithm(pilot); //searching pedestal and grabbing the can, then drive to the line
 			LightTest.handleLine(true);
 			turnOfUltrasonic();
-			nxt.sendReady();
-			nxt.waitForAnswer();
+			nxt.sendReady();		//1, steht an linie, klaue gebhoben
 			
-			liftClaw(38);
+			nxt.waitForAnswer();	//a.a
+			liftClaw(25);			// klaue wird in waagerechte gebracht
 			
-			nxt.waitForAnswer();
+			nxt.waitForAnswer();	// b.b
 			releaseCan();
+			
+			nxt.sendReady();		// 3, dose freigelassen, warten
+			nxt.waitForAnswer();	//c.c
+			Delay.msDelay(10000);
 			returnToField();
-			nxt.waitForAnswer();
 		}		
 	}
 
