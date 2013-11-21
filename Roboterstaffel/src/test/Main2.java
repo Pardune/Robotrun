@@ -262,7 +262,7 @@ public class Main2 {
 			findLine();					//linie gefunden
 			LightTest.handleLine(true);	//steht in pos gegenüber von 1
 			
-			liftClaw(40);
+			liftClaw(40);				// klaue senken
 			/*Motor.C.stop();
 			Motor.C.setSpeed(50);
 			Motor.C.rotateTo(90);*/
@@ -272,7 +272,7 @@ public class Main2 {
 			nxt.sendReady();
 			LightTest.followLine(false);
 			pilot.travel(150);
-			liftClaw(-40);
+			liftClaw(40);
 			
 			nxt.sendReady();
 			Delay.msDelay(2000);
