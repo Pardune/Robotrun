@@ -22,12 +22,13 @@ public class Main2 {
 	static int findMaxDistance(int[] rotationArray) {	//calculate to biggest distance, makes collisions unlikely but still possible
 		int maxDistance = 0;							//robot should drive into the center to ease can detection -> then handle line (avoid or drive onto it)
 		int maxDistanceRot = 0;
-		for(int i = 0; i < 72; i++) {
-			int newDistance = rotationArray[i] + rotationArray[i+1] + rotationArray[i+2] + rotationArray[i+3]		//possibly to many values -> wrong directions & higher collision danger?
-					+ rotationArray[i+4] + rotationArray[i+5] + rotationArray[i+6]+ rotationArray[i+7] + rotationArray[i+8];
+		int start = (int) (Math.random()*72);
+		for(int i = start; i < i+72; i++) {
+			int newDistance = rotationArray[(i+72)%72] + rotationArray[(i+73)%72] + rotationArray[(i+74)%72] + rotationArray[(i+75)%72]		//possibly to many values -> wrong directions & higher collision danger?
+					+ rotationArray[(i+76)%72] + rotationArray[(i+77)%72] + rotationArray[(i+78)%72]+ rotationArray[(i+79)%72] + rotationArray[(i+80)%72];
 			if(newDistance > maxDistance) {
 				maxDistance = newDistance;
-				maxDistanceRot = i+4;
+				maxDistanceRot = (i+76)%72;
 			}
 		}
 		System.out.println("          " + rotationArray[maxDistanceRot]);
@@ -184,6 +185,64 @@ public class Main2 {
 		System.out.println("         X " + peak);
 		return peak;
 	}
+	
+	static int edgeScan() {
+		UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
+		int measured = 0;
+		int rightEdge=-1;
+		int value;
+		do {
+			value = 0;
+			int numValidMeasurements = 0;
+			for(int j = 0; j<5; j++) {
+				measured = us.getDistance();
+				Delay.msDelay(80);
+				if (measured != 255) {
+					value += measured;
+					numValidMeasurements++;
+				}
+			}
+			if(numValidMeasurements == 0) {
+				value = measured;
+			} else {
+				value = (int) (value/numValidMeasurements);
+			}
+			rightEdge++;
+			pilot.rotate(1);
+			while(pilot.isMoving()) Thread.yield();
+		}
+		while(value < 30);
+		pilot.rotate(-rightEdge);
+		while(pilot.isMoving()) Thread.yield();
+		
+		measured = 0;
+		int leftEdge=1;
+		do {
+			value = 0;
+			int numValidMeasurements = 0;
+			for(int j = 0; j<5; j++) {
+				measured = us.getDistance();
+				Delay.msDelay(80);
+				if (measured != 255) {
+					value += measured;
+					numValidMeasurements++;
+				}
+			}
+			if(numValidMeasurements == 0) {
+				value = measured;
+			} else {
+				value = (int) (value/numValidMeasurements);
+			}
+			leftEdge--;
+			pilot.rotate(-1);
+			while(pilot.isMoving()) Thread.yield();
+		}
+		while(value < 30);
+		pilot.rotate(-leftEdge);
+		while(pilot.isMoving()) Thread.yield();
+		return(leftEdge+rightEdge);
+		
+	}
 
 	static boolean drive(int distance) {
 		line = false;
@@ -257,25 +316,24 @@ public class Main2 {
 		while (true) {
 			turnOfUltrasonic();
 			liftClaw();
-			nxt.waitForAnswer();
 			
+			
+			nxt.waitForAnswer();		//1.1
 			findLine();					//linie gefunden
-			LightTest.handleLine(true);	//steht in pos gegenüber von 1
+			LightTest.handleLine(true);	//steht in pos gegenÃ¼ber von 1
+			liftClaw(40);				// klaue senken, geöffnet
 			
-			liftClaw(40);				// klaue senken
-			/*Motor.C.stop();
-			Motor.C.setSpeed(50);
-			Motor.C.rotateTo(90);*/
-			
-			
-			Delay.msDelay(2000);
-			nxt.sendReady();
+			//Delay.msDelay(1000);
+			nxt.sendReady();			//a, klaue offen
 			LightTest.followLine(false);
 			pilot.travel(150);
-			liftClaw(40);
+			liftClaw(-40);
+			nxt.sendReady();		// b, roboter übergabebereit, dose gegriffen
 			
-			nxt.sendReady();
-			Delay.msDelay(2000);
+			
+			nxt.waitForAnswer();	// 3.3
+			pilot.travel(-100);
+			while(pilot.isMoving()) Thread.yield();
 			liftClaw();
 			/*Motor.C.setSpeed(50);
 			Motor.C.rotateTo(-90);
@@ -284,7 +342,7 @@ public class Main2 {
 			
 			returnToField();
 			mainAlgorithm(pilot);
-			nxt.sendReady();
+			nxt.sendReady();		//c
 		}		
 	}
 
@@ -468,7 +526,8 @@ public class Main2 {
 			System.out.println("         B " + peakDist);
 			if(drive((peakDist-20)*10))return false;
 
-			int peak = preciseScan();
+			//int peak = preciseScan();
+			int peak = edgeScan();
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
@@ -488,7 +547,8 @@ public class Main2 {
 			System.out.println("         C " + peakDist);
 			drive(-100);
 		} else {
-			int peak = preciseScan();
+			//int peak = preciseScan();
+			int peak = edgeScan();
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
