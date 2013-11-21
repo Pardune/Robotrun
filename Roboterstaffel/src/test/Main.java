@@ -255,21 +255,21 @@ public class Main {
 		LightTest.setPilot();
 		Button.waitForAnyPress();
 		LightTest.setLineValue();
-		//CommMaster nxt = new CommMaster();
+		CommMaster nxt = new CommMaster();
 		while (true) {
 			liftClaw();
 			mainAlgorithm(pilot); //searching pedestal and grabbing the can, then drive to the line
 			LightTest.handleLine(true);
 			turnOfUltrasonic();
-			//nxt.sendReady();
-			//nxt.waitForAnswer();
+			nxt.sendReady();
+			nxt.waitForAnswer();
 			
 			liftClaw(38);
 			
-			//nxt.waitForAnswer();
+			nxt.waitForAnswer();
 			releaseCan();
 			returnToField();
-			//nxt.waitForAnswer();
+			nxt.waitForAnswer();
 		}		
 	}
 
@@ -434,7 +434,7 @@ public class Main {
 			System.out.println("         C " + peakDist);
 			rotate(peak);
 
-			liftClaw();
+			openClaw();
 			
 			UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
 			while(us.getDistance()>7) {		//drive to can stopping 7 cm in front of u.s.sensor

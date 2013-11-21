@@ -269,14 +269,13 @@ public class Main2 {
 			
 			
 			Delay.msDelay(2000);
+			nxt.sendReady();
 			LightTest.followLine(false);
 			pilot.travel(150);
-			nxt.sendReady();
 			liftClaw(-40);
 			
-			Delay.msDelay(2000);
 			nxt.sendReady();
-			
+			Delay.msDelay(2000);
 			liftClaw();
 			/*Motor.C.setSpeed(50);
 			Motor.C.rotateTo(-90);
