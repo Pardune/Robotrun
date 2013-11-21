@@ -503,6 +503,7 @@ public class Main {
 				//System.out.println("         X " + us.getDistance());
 				if(drive(10)) return false;
 			}
+			if(drive(40)) return false;
 			liftClaw();
 			
 			//			Delay.msDelay(4000);		//wait to ensure claw closure
@@ -526,7 +527,7 @@ public class Main {
 				//System.out.println("         X " + us.getDistance());
 				if(drive(10)) return false;
 			}
-			if(drive(30)) return false;
+			if(drive(40)) return false;
 			liftClaw();
 			//			Delay.msDelay(4000);		//wait to ensure claw closure
 			grabbedCan = true;			//can now grabbed
