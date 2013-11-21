@@ -43,20 +43,20 @@ public class ObjectsPardune {
 	 *  
 	 *  einteilen in dreiecke
 	 *  der roboter teilt das Feld mit seiner Position in vier Dreiecke
-	 *  ein, deren hypotenuse immer 2m beträgt.
+	 *  ein, deren hypotenuse immer 2m betrï¿½gt.
 	 *  die Eckpunkte der Dreiecke sind Ecken des Feldes und damit absolute Maxima.
 	 *  ein Podest hat das geringste minimum zwischen den beiden absoluten Maxima.
 	 *  
 	 *  
 	 *  einteilen in rechtecke
-	 *  lokale minima stellen wände dar, somit kann das feld in vierecke eingeteilt werden.
+	 *  lokale minima stellen wï¿½nde dar, somit kann das feld in vierecke eingeteilt werden.
 	 *  In diesen gibt es ein absolutes maxima (ecke) und evtl ein absolutes minimum(podest)
 	 *  
 	 *  
 	 *  fahren in die mitte
-	 *  der roboter fährt zur größten distanz, stoppt bei der Mittellinie (diese wird er
+	 *  der roboter fï¿½hrt zur grï¿½ï¿½ten distanz, stoppt bei der Mittellinie (diese wird er
 	 *  tangieren), richtet sich an der linie, in der mitte aus, scannt seine umgebung um
-	 *  180° und sucht ein von den bekannten messwerten abweichenden wert. dieser stellt
+	 *  180ï¿½ und sucht ein von den bekannten messwerten abweichenden wert. dieser stellt
 	 *  das podest dar. 
 	 *  
 	 *  
@@ -64,7 +64,7 @@ public class ObjectsPardune {
 	 *                   \o/		/(
 	 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	        o		o           O 		8
-	      °         °°       °°       °
+	      ï¿½         ï¿½ï¿½       ï¿½ï¿½       ï¿½
 	 
 	 *  
 	 */
@@ -122,7 +122,7 @@ public class ObjectsPardune {
 		int lokalesMaximumIndex = 0;
 
 		// es gibt bei jeder drehung maximal 4 (de facto wahrsch 3) maxima.
-		// hinzu kommen evtl. lokale für
+		// hinzu kommen evtl. lokale fï¿½r
 		// 1. das Podest
 		// 2. das andere Podest
 		// 3. den anderen roboter
@@ -201,14 +201,14 @@ public class ObjectsPardune {
 			if (distanceIncreasing){
 				// search first decrease in distance
 				for(i = 0; i<differenceBetweenVals.length; i++){	// for each int in array, save value in diff
-					if (differenceBetweenVals[i] < 0 && differenceBetweenVals[i] > 15){
+					if (differenceBetweenVals[i] < 0 && differenceBetweenVals[i] > 15){	//### never the case
 						System.out.println("feature at: " +i);
 					}
-				}
+				}																//####### should these if conditions contain multiple diffrence indices?
 			} else {
 				// search first decrease in distance
 				for(i = 0; i<differenceBetweenVals.length; i++){
-					if (differenceBetweenVals[i] >= 0 && differenceBetweenVals[i] > 15){
+					if (differenceBetweenVals[i] >= 0 && differenceBetweenVals[i] > 15){ //###differenceBetweenVals[i] >= 0 not needed
 						System.out.println("feature at: " + i);
 					}
 				}
