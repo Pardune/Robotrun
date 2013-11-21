@@ -126,6 +126,64 @@ public class Main {
 			return true;
 		} else return false;
 	}
+	
+	static int edgeScan() {
+		UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
+		int measured = 0;
+		int rightEdge=-1;
+		int value;
+		do {
+			value = 0;
+			int numValidMeasurements = 0;
+			for(int j = 0; j<5; j++) {
+				measured = us.getDistance();
+				Delay.msDelay(80);
+				if (measured != 255) {
+					value += measured;
+					numValidMeasurements++;
+				}
+			}
+			if(numValidMeasurements == 0) {
+				value = measured;
+			} else {
+				value = (int) (value/numValidMeasurements);
+			}
+			rightEdge++;
+			pilot.rotate(1);
+			while(pilot.isMoving()) Thread.yield();
+		}
+		while(value < 30);
+		pilot.rotate(-rightEdge);
+		while(pilot.isMoving()) Thread.yield();
+		
+		measured = 0;
+		int leftEdge=1;
+		do {
+			value = 0;
+			int numValidMeasurements = 0;
+			for(int j = 0; j<5; j++) {
+				measured = us.getDistance();
+				Delay.msDelay(80);
+				if (measured != 255) {
+					value += measured;
+					numValidMeasurements++;
+				}
+			}
+			if(numValidMeasurements == 0) {
+				value = measured;
+			} else {
+				value = (int) (value/numValidMeasurements);
+			}
+			leftEdge--;
+			pilot.rotate(-1);
+			while(pilot.isMoving()) Thread.yield();
+		}
+		while(value < 30);
+		pilot.rotate(-rightEdge);
+		while(pilot.isMoving()) Thread.yield();
+		return(leftEdge+rightEdge);
+		
+	}
 
 	static int preciseScan() {
 		UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
@@ -426,8 +484,8 @@ public class Main {
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			System.out.println("         B " + peakDist);
 			if(drive((peakDist-20)*10))return false;
-
-			int peak = preciseScan();
+			//int peak = preciseScan();
+			int peak = edgeScan();
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
@@ -449,7 +507,8 @@ public class Main {
 			System.out.println("         C " + peakDist);
 			drive(-100);
 		} else {
-			int peak = preciseScan();
+			//int peak = preciseScan();
+			int peak = edgeScan();
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
