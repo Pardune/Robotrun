@@ -26,7 +26,8 @@ public class Main {
 		int maxDistance = 0;							//robot should drive into the center to ease can detection -> then handle line (avoid or drive onto it)
 		int maxDistanceRot = 0;
 		int start = (int) (Math.random()*72);
-		for(int i = start; i < i+72; i++) {
+		for(int i = start; i < start+72; i++) {
+			System.out.println("         "+i);
 			int newDistance = rotationArray[(i+72)%72] + rotationArray[(i+73)%72] + rotationArray[(i+74)%72] + rotationArray[(i+75)%72]		//possibly to many values -> wrong directions & higher collision danger?
 					+ rotationArray[(i+76)%72] + rotationArray[(i+77)%72] + rotationArray[(i+78)%72]+ rotationArray[(i+79)%72] + rotationArray[(i+80)%72];
 			if(newDistance > maxDistance) {
@@ -34,8 +35,6 @@ public class Main {
 				maxDistanceRot = (i+76)%72;;
 			}
 		}
-		System.out.println("          " + rotationArray[maxDistanceRot]);
-
 		return maxDistanceRot;
 
 
