@@ -144,10 +144,10 @@ public class ObjectsPardune {
 		System.out.println("lokale Maxima gef.:" + lokalesMaximumIndex);
 	}
 	
-	private void (){
+	//private void (){
 		
 		
-	}
+	//}
 
 	/***
 	 * 
