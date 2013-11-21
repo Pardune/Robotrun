@@ -192,12 +192,13 @@ for(int c = 0; c < 72; c++) {
 	}
 	
 	public static void liftClaw(int angle) {
-		Motor.C.setSpeed(20);
-		Motor.C.setStallThreshold(2, 100);
+		Motor.C.setSpeed(8);
 		Motor.C.rotateTo(angle);
+/*		Motor.C.setStallThreshold(2, 100);
+		
 		while(!Motor.C.isStalled()){
 			Delay.msDelay(10);
-		}
+		}*/
 		Motor.C.stop();
 	}
 	
@@ -208,16 +209,16 @@ for(int c = 0; c < 72; c++) {
 		Button.waitForAnyPress();
 		LightTest.setLineValue();
 		CommSlave nxt = new CommSlave();
-
+		
 		while (true) {
 			turnOfUltrasonic();
-			liftClaw(-90);
+			liftClaw(-55);
 			nxt.waitForAnswer();
 			
 			findLine();					//linie gefunden
 			LightTest.handleLine(true);	//steht in pos gegenüber von 1
 			
-			liftClaw(90);
+			liftClaw(40);
 			/*Motor.C.stop();
 			Motor.C.setSpeed(50);
 			Motor.C.rotateTo(90);*/
@@ -226,15 +227,13 @@ for(int c = 0; c < 72; c++) {
 			Delay.msDelay(2000);
 			LightTest.followLine(false);
 			pilot.travel(150);
-			
-			liftClaw(-25);
-			/*Motor.C.setSpeed(50);
-			Motor.C.rotateTo(-25);*/
+			nxt.sendReady();
+			liftClaw(-40);
 			
 			Delay.msDelay(2000);
 			nxt.sendReady();
 			
-			liftClaw(-90);
+			liftClaw(-55);
 			/*Motor.C.setSpeed(50);
 			Motor.C.rotateTo(-90);
 			
@@ -391,6 +390,43 @@ for(int c = 0; c < 72; c++) {
 		}
 	}
 
+	public static void alignToPedestal() {
+		UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
+		int[] rotArray = new int[40];
+		pilot.rotate(20);
+		System.out.println("     thread:");
+		Thread thread1 = new Thread() {		//thread for complete turn
+			public void run() {
+				pilot.rotate(-40);
+			}
+		};
+		thread1.start();
+		System.out.println("     thread gemacht");
+
+		for(int rotation = 0; rotation < 40; rotation++ ) {
+			while (rotation < pilot.getAngleIncrement()) { 
+				Delay.msDelay(1);
+				System.out.println("        " + pilot.getAngleIncrement());
+			}
+			rotArray[rotation]=us.getDistance();		 
+			System.out.println("          " + rotArray[rotation]);
+		}
+		
+		int sum = 10000;
+		int indexOfBiggestSum = 0;
+		for (int i = 0; i < 38; i++) {
+			int nextSum = rotArray[i] + rotArray[i+1] + rotArray[i+2]; //+ rotArray[i+3] + rotArray[i+4];
+			if (nextSum < sum) {
+				sum = nextSum;
+				indexOfBiggestSum = i;
+			}
+			System.out.println("      --------");
+		}
+		System.out.println("       VERZWEIFLUNG!!!!");
+		rotate(39 - (indexOfBiggestSum));
+		Delay.msDelay(1000);
+	}
+	
 	static boolean driveNGrabCan(int peakRot, int peakDist) {
 
 		boolean grabbedCan = false;
@@ -420,6 +456,7 @@ for(int c = 0; c < 72; c++) {
 			if(drive((peakDist - 15)*10))return false;
 		} else {						//can near enough to be grabbed
 			
+			alignToPedestal();
 			Motor.C.setSpeed(8);
 			Delay.msDelay(4000);
 			drive((peakDist - 6)*10);	//drive to can stopping 10 cm in front of u.s.sensor
