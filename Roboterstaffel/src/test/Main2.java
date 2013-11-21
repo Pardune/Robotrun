@@ -191,6 +191,7 @@ public class Main2 {
 		int rightEdge=-1;
 		int value;
 		do {
+			if(rightEdge > 36) return -1000; //don't except edges further than 36°
 			value = 0;
 			int numValidMeasurements = 0;
 			for(int j = 0; j<5; j++) {
@@ -217,6 +218,7 @@ public class Main2 {
 		measured = 0;
 		int leftEdge=1;
 		do {
+			if(rightEdge < -36) return -1000; //don't except edges further than 36°
 			value = 0;
 			int numValidMeasurements = 0;
 			for(int j = 0; j<5; j++) {
@@ -287,9 +289,9 @@ public class Main2 {
 		Motor.C.rotate(+3);
 		Motor.C.stop();
 	}
-    public static void liftClaw(int angle) {
+    public static void moveClaw(int angle) {
         Motor.C.setSpeed(8);
-        Motor.C.rotateTo(angle);
+        Motor.C.rotate(angle);
         Motor.C.stop();
     }
     
@@ -306,7 +308,7 @@ public class Main2 {
 	
 	public static void main(String[] args) {
 		pilot.setAcceleration(50); //30 if floor slippery
-		pilot.setRotateSpeed(60);
+		pilot.setRotateSpeed(20);
 		LightTest.setPilot();
 		Button.waitForAnyPress();
 		LightTest.setLineValue();
@@ -320,13 +322,13 @@ public class Main2 {
 			nxt.waitForAnswer();		//1.1
 			findLine();					//linie gefunden
 			LightTest.handleLine(true);	//steht in pos gegenÃ¼ber von 1
-			liftClaw(40);				// klaue senken, geöffnet
+			openClaw();				// klaue senken, geöffnet
 			
 			//Delay.msDelay(1000);
 			nxt.sendReady();			//a, klaue offen
 			LightTest.followLine(false);
 			pilot.travel(150);
-			liftClaw(-40);
+			moveClaw(-65);
 			nxt.sendReady();		// b, roboter übergabebereit, dose gegriffen
 			
 			
@@ -527,6 +529,7 @@ public class Main2 {
 
 			//int peak = preciseScan();
 			int peak = edgeScan();
+			if(peak == -1000) return false;
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
@@ -538,7 +541,7 @@ public class Main2 {
 				//System.out.println("         X " + us.getDistance());
 				if(drive(10)) return false;
 			}
-			if(drive(40)) return false;
+			if(drive(50)) return false;
 			openClaw();
 			
 			//			Delay.msDelay(4000);		//wait to ensure claw closure
@@ -549,6 +552,7 @@ public class Main2 {
 		} else {
 			//int peak = preciseScan();
 			int peak = edgeScan();
+			if(peak == -1000) return false;
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
@@ -560,7 +564,7 @@ public class Main2 {
 				//System.out.println("         X " + us.getDistance());
 				if(drive(10)) return false;
 			}
-			if(drive(40)) return false;
+			if(drive(50)) return false;
 			openClaw();
 			//			Delay.msDelay(4000);		//wait to ensure claw closure
 			setDown = true;			//can now grabbed

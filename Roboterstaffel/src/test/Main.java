@@ -134,6 +134,7 @@ public class Main {
 		int rightEdge=-1;
 		int value;
 		do {
+			if(rightEdge > 36) return -1000;
 			value = 0;
 			int numValidMeasurements = 0;
 			for(int j = 0; j<5; j++) {
@@ -160,6 +161,7 @@ public class Main {
 		measured = 0;
 		int leftEdge=1;
 		do {
+			if(rightEdge < -36) return -1000;
 			value = 0;
 			int numValidMeasurements = 0;
 			for(int j = 0; j<5; j++) {
@@ -290,9 +292,9 @@ public class Main {
 		Motor.C.rotate(+3);
 		Motor.C.stop();
 	}
-    public static void liftClaw(int angle) {
+    public static void moveClaw(int angle) {
         Motor.C.setSpeed(8);
-        Motor.C.rotateTo(angle);
+        Motor.C.rotate(angle);
         Motor.C.stop();
     }
     
@@ -323,15 +325,16 @@ public class Main {
 			nxt.sendReady();		//1, steht an linie, klaue gebhoben
 			
 			nxt.waitForAnswer();	//a.a
-			liftClaw(25);			// klaue wird in waagerechte gebracht
+			moveClaw(45);			// klaue wird in waagerechte gebracht
 			
 			nxt.waitForAnswer();	// b.b
 			releaseCan();
 			
 			nxt.sendReady();		// 3, dose freigelassen, warten
-			nxt.waitForAnswer();	//c.c
+			
 			Delay.msDelay(10000);
 			returnToField();
+			nxt.waitForAnswer();	//c.c
 		}		
 	}
 
@@ -490,6 +493,7 @@ public class Main {
 			if(drive((peakDist-20)*10))return false;
 			//int peak = preciseScan();
 			int peak = edgeScan();
+			if(peak == -1000) return false;
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
@@ -503,7 +507,7 @@ public class Main {
 				//System.out.println("         X " + us.getDistance());
 				if(drive(10)) return false;
 			}
-			if(drive(40)) return false;
+			if(drive(50)) return false;
 			liftClaw();
 			
 			//			Delay.msDelay(4000);		//wait to ensure claw closure
@@ -514,6 +518,7 @@ public class Main {
 		} else {
 			//int peak = preciseScan();
 			int peak = edgeScan();
+			if(peak == -1000) return false;
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
@@ -527,7 +532,7 @@ public class Main {
 				//System.out.println("         X " + us.getDistance());
 				if(drive(10)) return false;
 			}
-			if(drive(40)) return false;
+			if(drive(50)) return false;
 			liftClaw();
 			//			Delay.msDelay(4000);		//wait to ensure claw closure
 			grabbedCan = true;			//can now grabbed
