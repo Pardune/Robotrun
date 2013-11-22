@@ -1,7 +1,5 @@
-package test;
+package robot;
 
-import pardune.CommMaster;
-import pardune.CommSlave;
 import lejos.nxt.Button;
 import lejos.nxt.LightSensor;
 import lejos.nxt.Motor;
@@ -12,6 +10,9 @@ import lejos.robotics.navigation.DifferentialPilot;
 import lejos.util.Delay;
 
 import java.lang.Math;
+
+import communication.CommMaster;
+import communication.CommSlave;
 
 /**
  * Contains the main method for the can transportation of robot1

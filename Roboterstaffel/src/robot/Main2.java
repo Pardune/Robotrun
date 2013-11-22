@@ -1,7 +1,8 @@
-package test;
+package robot;
 
-import pardune.CommMaster;
-import pardune.CommSlave;
+import communication.CommMaster;
+import communication.CommSlave;
+
 import lejos.nxt.Button;
 import lejos.nxt.LightSensor;
 import lejos.nxt.Motor;
