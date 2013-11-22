@@ -26,9 +26,9 @@ public class Main {
 	static boolean line = false;
 
 	/**
-	 * @param maxDistance is one of the biggest sums of 9 neighboring distances
-	 * @param maxDistanceRot is the corresponding rotation of the middle distance in maxDistance
-	 * @param start is a random integer between 0 and 71 to avoid a robot movement loop
+	 * @param maxDistance 		one of the biggest sums of 9 neighboring distances
+	 * @param maxDistanceRot	the corresponding rotation of the middle distance in maxDistance
+	 * @param start				a random integer between 0 and 71 to avoid a robot movement loop
 	 */
 
 	static int findMaxDistance(int[] rotationArray) {	//calculate to biggest distance, makes collisions unlikely but still possible
@@ -49,11 +49,15 @@ public class Main {
 
 	}
 
+	/**
+	 * @param peak 	the roation of the found peak, -1000 if no peak found
+	 * @param i		lowest unchecked distance
+	 **/
 	static int findPeak(int[] rotationArray) {
 
 		int[] sortArray = arraySort(rotationArray);
-		int peak = -1000; //returned if no peak found
-		int i; //lowest unchecked distance
+		int peak = -1000;
+		int i;
 		for(int c = 0; c < 72; c++) {
 
 			i = sortArray[c]; //get rotationArray index in order of c
