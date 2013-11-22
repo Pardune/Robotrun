@@ -9,7 +9,7 @@ import lejos.nxt.comm.Bluetooth;
 /**
  * this program receives data from a master
  * 
- *
+ * @author birger
  */
 public class CommSlave {
 	

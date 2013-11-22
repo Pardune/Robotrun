@@ -11,6 +11,7 @@ import lejos.nxt.comm.Bluetooth;
  * this programm sends data to a slave
  * it's used to tell the other robot what to do
  *
+ * @author birger
  */
 public class CommMaster {
 	DataOutputStream dos;
