@@ -31,7 +31,6 @@ public class Main {
 	 * @param rotationArray	  72 sized array containing circular measured distances
 	 * @return maxDistanceRot rotation to a maximal distance
 	 */
-
 	static int findMaxDistance(int[] rotationArray) {	
 		int maxDistance = 0; 				  //one of the biggest sums of 9 neighboring distances
 		int maxDistanceRot = 0; 			  //the corresponding rotation of the middle distance in maxDistance
@@ -356,11 +355,11 @@ public class Main {
 		Motor.C.rotate(-3);
 		Motor.C.stop();
     }
+    
     /**
      * Set values and create CommMaster. Program cycle for robot1.
      * @param args
      */
-
 	public static void main(String[] args) {
 		Delay.msDelay(10000);
 		pilot.setAcceleration(50); //30 if floor slippery
