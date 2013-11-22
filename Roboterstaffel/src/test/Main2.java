@@ -24,7 +24,10 @@ public class Main2 {
 	static boolean line = false;
 
 	/**
-	 * @param args
+	 * Calculate the rotation of one biggest distance to ease can detection or get on line.
+	 * 
+	 * @param rotationArray	  72 sized array containing circular measured distances
+	 * @return maxDistanceRot rotation to a maximal distance
 	 */
 	static int findMaxDistance(int[] rotationArray) {	//calculate to biggest distance, makes collisions unlikely but still possible
 		int maxDistance = 0;							//robot should drive into the center to ease can detection -> then handle line (avoid or drive onto it)
@@ -44,6 +47,12 @@ public class Main2 {
 
 	}
 
+	/**
+	 * Find a through in the rotationArray, that is not a wall.
+	 * 
+	 * @param rotationArray 72 sized array containing circular measured distances
+	 * @return trough 		the rotation trough, -1000 if no trough found
+	 **/
 	static int findTrough(int[] rotationArray) {
 
 		int[] sortArray = arraySort(rotationArray);
@@ -80,6 +89,12 @@ public class Main2 {
 		return trough;
 	}
 
+	/**
+	 * Bubble sort the distances of the rotationArray to order the indices by ascending distance.
+	 * 
+	 * @param rotationArray 72 sized array containing circular measured distances
+	 * @return arraySort	the indices of the rotationArray ordered by ascending distance
+	 */
 	static int[] arraySort(int[] rotationArray) {
 		int temp1;		//rotationArray temp
 		int temp2;		//sortArray temp
@@ -107,6 +122,14 @@ public class Main2 {
 		return sortArray;
 	}
 
+	/**
+	 * Search for a descending jump of at least 16 cm in direction of the angleSegment rotation on both sides.
+	 * 
+	 * @param rotationArray 72 sized array containing circular measured distances
+	 * @param angleSegment  the rotation segment of the roationArray, that is searched for jumps
+	 * @param i				the width of search in each direction
+	 * @return 				true if jumps on both side of the rotation segment
+	 */
 	static boolean jumpFinder(int[] rotationArray, int angleSegment, int i) {
 
 		boolean foundLeftJump = false;
@@ -192,6 +215,11 @@ public class Main2 {
 //		return trough;
 //	}
 	
+	/**
+	 * Scan for a distance of at least 30cm from the central rotation to the sides in an angle of 36° on each side.
+	 * 
+	 * @return central angle in degrees in relation to both edges or -1000 if not both edges found
+	 */
 	static int edgeScan() {
 		UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
 		int measured = 0;
@@ -252,6 +280,12 @@ public class Main2 {
 		
 	}
 
+	/**
+	 * Drive to distance in mm and stop fast if line detected.
+	 * 
+	 * @param distance  drive distance in mm
+	 * @return line		true if line found
+	 */
 	static boolean drive(int distance) {
 		line = false;
 		LightSensor light = new LightSensor(SensorPort.S1);
@@ -269,6 +303,12 @@ public class Main2 {
 		return line;
 	}
 
+	/**
+	 * Rotate to angle in degree and stop fast if line detected.
+	 * 
+	 * @param angle	rotation angle in degree
+	 * @return line	true if line found
+	 */
 	static boolean rotate(int angle) {
 		line = false;
 		LightSensor light = new LightSensor(SensorPort.S1);
@@ -285,7 +325,10 @@ public class Main2 {
 		}
 		return line;
 	}
-
+	
+	/**
+	 * Lift the claw till the motor stalls and reverse 3 degrees.
+	 */
 	public static void liftClaw() {
 		Motor.C.rotate(20);
 		Motor.C.rotate(-1);
@@ -302,6 +345,9 @@ public class Main2 {
         Motor.C.stop();
     }
     
+    /**
+     * Lower the claw till the motor stalls and reverse 3 degrees
+     */
     public static void openClaw() {
 		Motor.C.setSpeed(100);
 		Motor.C.rotate(1);
@@ -313,6 +359,10 @@ public class Main2 {
 		Motor.C.stop();
     }
 	
+    /**
+     * Set values and create CommMaster. Program cycle for robot2.
+     * @param args
+     */
 	public static void main(String[] args) {
 		pilot.setAcceleration(50); //30 if floor slippery
 		pilot.setRotateSpeed(20);
@@ -354,16 +404,28 @@ public class Main2 {
 		}		
 	}
 
+	/**
+	 * Turn the ultrasonic sensor off.
+	 */
 	public static void turnOfUltrasonic() {
 		UltrasonicSensor ultra = new UltrasonicSensor(SensorPort.S4);
 		ultra.off();
 	}
 
+	/**
+	 * Robot is on Line and rotates 90 degrees to the right and travels 15cm.
+	 */
 	public static void returnToField() {
 		pilot.rotate(-90);
 		pilot.travel(150);
 	}
 
+	/**
+	 * While can not found search for can. If no can found in measurement drive in direction of findMaxDistance().
+	 * If can found execute driveNGrabCan() and if this grabs the can return to main method.
+	 * 
+	 * @param pilot the differential pilot for driving
+	 */
 	public static void mainAlgorithm(DifferentialPilot pilot) {
 
 		int troughRot;  //rotation direction of supposed can position
@@ -413,6 +475,11 @@ public class Main2 {
 		}
 	}
 
+	/**
+	 * Rotate 360 degrees and measure the distance every 5 degrees.
+	 * 
+	 * @return roationArray	72 sized array containing circular measured distances
+	 */
 	private static int[] rotateNscan() {
 		Thread thread1 = new Thread() {		//thread for complete turn
 			public void run() {
@@ -446,11 +513,17 @@ public class Main2 {
 		return rotationArray;
 	}
 
+	/**
+	 * Travel back 50 cm.
+	 */
 	public static void avoidLine() {
 		pilot.rotate(180);
 		pilot.travel(500);
 	}
 
+	/**
+	 * Drive to one of the biggest distance till the line is found.
+	 */
 	public static void findLine() {
 		while(true) {
 			int[] rotationArray = rotateNscan();
@@ -510,6 +583,14 @@ public class Main2 {
 //		Delay.msDelay(1000);
 //	}
 	
+	/**
+	 * Drive in the direction of the can if distance to can bigger than 22cm. If below 83cm execute
+	 * edgeScan() and if this returns an angle different to -1000 approach can and grab it.
+	 * 
+	 * @param troughRot		the rotation through (that should be in the direction of the can)
+	 * @param troughDist	the distance of the rotation through
+	 * @return				true if can grabbed
+	 */
 	static boolean driveNGrabCan(int troughRot, int troughDist) {
 
 		boolean setDown = false;
