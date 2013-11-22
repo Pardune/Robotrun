@@ -154,7 +154,7 @@ public class Main {
 	}
 	
 	/**
-	 * Scan for a distance of at least 30cm from the central rotation to the sides in an angle of 36° on each side.
+	 * Scan for a distance of at least 30cm from the central rotation to the sides in an angle of 36 degrees on each side.
 	 * 
 	 * @return central angle in degrees in relation to both edges or -1000 if not both edges found
 	 */
@@ -484,7 +484,7 @@ public class Main {
 		int[] rotationArray = new int[81];
 
 		for(int rotation = 0; rotation < 72; rotation++ ) {
-			while (rotation*5 > pilot.getAngleIncrement()) { //every 5°
+			while (rotation*5 > pilot.getAngleIncrement()) { //every 5 degrees
 				Delay.msDelay(1);
 			}
 			rotationArray[rotation]=us.getDistance();		 //save distance
@@ -551,7 +551,7 @@ public class Main {
 		boolean grabbedCan = false;
 
 		Sound.setVolume(80);
-		if(troughRot >= 36) troughRot = troughRot - 72;	//turn max 180° 
+		if(troughRot >= 36) troughRot = troughRot - 72;	//turn max 180 degrees
 		if(rotate(troughRot*5)){ //convert to degree and rotate
 			pilot.rotate(-pilot.getAngleIncrement());
 			return false;
