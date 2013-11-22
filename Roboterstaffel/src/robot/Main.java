@@ -337,6 +337,12 @@ public class Main {
 		Motor.C.rotate(+3);
 		Motor.C.stop();
 	}
+	
+	/**
+	 * Move the claw at a specified angle.
+	 * 
+	 * @param angle the angle of rotation
+	 */
     public static void moveClaw(int angle) {
         Motor.C.setSpeed(8);
         Motor.C.rotate(angle);
