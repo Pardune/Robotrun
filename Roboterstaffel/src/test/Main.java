@@ -461,6 +461,11 @@ public class Main {
 		}
 	}
 
+	/**
+	 * Rotate 360 degrees and measure the distance every 5 degrees.
+	 * 
+	 * @return roationArray	72 sized array containing circular measured distances
+	 */
 	private static int[] rotateNscan() {
 		Thread thread1 = new Thread() {		//thread for complete turn
 			public void run() {
@@ -494,11 +499,17 @@ public class Main {
 		return rotationArray;
 	}
 
+	/**
+	 * Travel back 50 cm.
+	 */
 	public static void avoidLine() {
 		pilot.rotate(180);
 		pilot.travel(500);
 	}
 
+	/**
+	 * Drive to one of the biggest distance till the line is found.
+	 */
 	public static void findLine() {
 		while(true) {
 			int[] rotationArray = rotateNscan();
@@ -521,6 +532,14 @@ public class Main {
 		}
 	}
 
+	/**
+	 * Drive in the direction of the can if distance to can bigger than 22cm. If below 83cm execute
+	 * edgeScan() and if this returns an angle different to -1000 approach can and grab it.
+	 * 
+	 * @param troughRot		the rotation through (that should be in the direction of the can)
+	 * @param troughDist	the distance of the rotation through
+	 * @return				true if can grabbed
+	 */
 	static boolean driveNGrabCan(int troughRot, int troughDist) {
 
 		boolean grabbedCan = false;
