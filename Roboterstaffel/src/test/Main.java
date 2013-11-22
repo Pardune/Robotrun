@@ -380,7 +380,7 @@ public class Main {
 			moveClaw(45);			// klaue wird in waagerechte gebracht
 			
 			nxt.waitForAnswer();	// b.b
-			releaseCan();
+			openClaw();
 			
 			nxt.sendReady();		// 3, dose freigelassen, warten
 			
@@ -391,29 +391,27 @@ public class Main {
 	}
 
 	/**
-	 * Turn the 
+	 * Turn the ultrasonic sensor off.
 	 */
 	public static void turnOfUltrasonic() {
 		UltrasonicSensor ultra = new UltrasonicSensor(SensorPort.S4);
 		ultra.off();
 	}
 
+	/**
+	 * Robot is on Line and rotates 90 degrees to the right and travels 15cm.
+	 */
 	public static void returnToField() {
 		pilot.rotate(-90);
 		pilot.travel(150);
 	}
 
-	private static void releaseCan() {
-		Motor.C.setSpeed(100);
-		Motor.C.rotate(1);
-		Motor.C.setStallThreshold(3, 100);
-		while(!Motor.C.isStalled()) {		//open Claw
-			Motor.C.rotate(1);
-		}
-		Motor.C.rotate(-3);
-		Motor.C.stop();
-	}
-
+	/**
+	 * While can not found search for can. If no can found in measurement drive in direction of findMaxDistance().
+	 * If can found execute driveNGrabCan() and if this grabs the can return to main method.
+	 * 
+	 * @param pilot the differential pilot for driving
+	 */
 	public static void mainAlgorithm(DifferentialPilot pilot) {
 
 		int troughRot;  //rotation direction of supposed can position
@@ -446,12 +444,12 @@ public class Main {
 				Sound.setVolume(100);
 				Sound.playNote(Sound.FLUTE, 1500, 1000);
 				Sound.playNote(Sound.FLUTE, 1500, 1000);
-				if(rotationArray[angle]>65) {			//TODO comment
+				if(rotationArray[angle]>65) {				//don't drive further than 45 cm to avoid collision
 					drive(450);
-				} else if(rotationArray[angle]>50) {	//TODO comment
+				} else if(rotationArray[angle]>50) {		//if distance between 66 and 50 cm drive 30 cm
 					drive(300);
 				} else {
-					drive((rotationArray[angle]-15)*10);	//TODO comment
+					drive((rotationArray[angle]-15)*10);	//if distance under 51 drive distance-15 cm
 				}
 				continue;						//start turning and measuring again
 			}
