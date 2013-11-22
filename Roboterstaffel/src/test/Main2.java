@@ -44,16 +44,16 @@ public class Main2 {
 
 	}
 
-	static int findPeak(int[] rotationArray) {
+	static int findTrough(int[] rotationArray) {
 
 		int[] sortArray = arraySort(rotationArray);
-		int peak = -1000; //returned if no peak found
+		int trough = -1000; //returned if no trough found
 		int i; //lowest unchecked distance
 		for(int c = 0; c < 72; c++) {
 
 			i = sortArray[c]; //get rotationArray index in order of c
 
-			if(rotationArray[i]>170) continue; 			// don't choose peak that's further away than 170 cm
+			if(rotationArray[i]>170) continue; 			// don't choose trough that's further away than 170 cm
 
 			//###
 
@@ -61,23 +61,23 @@ public class Main2 {
 
 			if(rotationArray[i]>50) {
 				if(jumpFinder(rotationArray, 5, i)) {
-					peak = i;
+					trough = i;
 					break;
 				}
 			}
-			else if(rotationArray[i]>30) {	//search above distance of 30 for peak because smaller distances are not as precise
+			else if(rotationArray[i]>30) {	//search above distance of 30 for trough because smaller distances are not as precise
 				if(jumpFinder(rotationArray, 7, i)) {
-					peak = i;
+					trough = i;
 					break;
 				}
 			} else {
 				if(jumpFinder(rotationArray, 8, i)) {
-					peak = i;
+					trough = i;
 					break;
 				}
 			}
 		}
-		return peak;
+		return trough;
 	}
 
 	static int[] arraySort(int[] rotationArray) {
@@ -112,8 +112,8 @@ public class Main2 {
 		boolean foundLeftJump = false;
 		boolean foundRightJump = false;
 		for(int k = -angleSegment+i; k < i; k++) {
-			if(rotationArray[(k+72)%72] ==255 && rotationArray[(k+73)%72] >50) continue;	//don't use values for peak search if they equal 255 (255 has high error probability)
-			//if(rotationArray[(k+72)%72] ==255 && rotationArray[(k+71)%72] != 255) continue; //don't use single 255 peak
+			if(rotationArray[(k+72)%72] ==255 && rotationArray[(k+73)%72] >50) continue;	//don't use values for trough search if they equal 255 (255 has high error probability)
+			//if(rotationArray[(k+72)%72] ==255 && rotationArray[(k+71)%72] != 255) continue; //don't use single 255 trough
 			if(rotationArray[(k+72)%72] - rotationArray[(k+73)%72] > 15) {
 				foundLeftJump = true;
 				break;
@@ -121,7 +121,7 @@ public class Main2 {
 		}
 		for(int k = i; k < angleSegment+i; k++) {
 			if(rotationArray[k+1] ==255 && rotationArray[k] >50 ) continue;
-			//if(rotationArray[(k+73)%72] ==255 && rotationArray[(k+74)%72] != 255) continue; //don't use single 255 peak
+			//if(rotationArray[(k+73)%72] ==255 && rotationArray[(k+74)%72] != 255) continue; //don't use single 255 trough
 			if(rotationArray[k+1] - rotationArray[k] > 15) {
 				foundRightJump = true;
 				break;
@@ -132,65 +132,65 @@ public class Main2 {
 		} else return false;
 	}
 
-	static int preciseScan() {
-		UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
-		int measured=0;
-		int min=1000;
-		int peak = 0;
-		for (int i=0; i < 21; i++) {
-			int value=0;
-			int numValidMeasurements = 0;
-			for(int j = 0; j<5; j++) {
-				measured = us.getDistance();
-				Delay.msDelay(80);
-				if (measured != 255) {
-					value += measured;
-					numValidMeasurements++;
-				}
-			}
-			if(numValidMeasurements == 0) {
-				value = measured;
-			} else {
-				value = (int) (value/numValidMeasurements);
-			}
-			if(min > value) {
-				min = value;
-				peak = i;
-			}
-			pilot.rotate(1);				// 5 degrees left
-			while(pilot.isMoving()) Thread.yield();
-		}
-		pilot.rotate(-21);				// 5 degrees left
-		while(pilot.isMoving()) Thread.yield();
-		for (int i=0; i > -21; i--) {
-			int value=0;
-			int numValidMeasurements = 0;
-			for(int j = 0; j<5; j++) {
-				measured = us.getDistance();
-				Delay.msDelay(80);
-				if (measured != 255) {
-					value += measured;
-					numValidMeasurements++;
-				}
-			}
-			if(numValidMeasurements == 0) {
-				value = measured;
-			} else {
-				value = (int) (value/numValidMeasurements);
-			}
-			if(min > value) {
-				min = value;
-				peak = i;
-			}
-			pilot.rotate(-1);				// 5 degrees left
-			while(pilot.isMoving()) Thread.yield();
-		}
-		pilot.rotate(21);				// 5 degrees left
-		while(pilot.isMoving()) Thread.yield();
-		System.out.println("         X " + min);
-		System.out.println("         X " + peak);
-		return peak;
-	}
+//	static int preciseScan() {
+//		UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
+//		int measured=0;
+//		int min=1000;
+//		int trough = 0;
+//		for (int i=0; i < 21; i++) {
+//			int value=0;
+//			int numValidMeasurements = 0;
+//			for(int j = 0; j<5; j++) {
+//				measured = us.getDistance();
+//				Delay.msDelay(80);
+//				if (measured != 255) {
+//					value += measured;
+//					numValidMeasurements++;
+//				}
+//			}
+//			if(numValidMeasurements == 0) {
+//				value = measured;
+//			} else {
+//				value = (int) (value/numValidMeasurements);
+//			}
+//			if(min > value) {
+//				min = value;
+//				trough = i;
+//			}
+//			pilot.rotate(1);				// 5 degrees left
+//			while(pilot.isMoving()) Thread.yield();
+//		}
+//		pilot.rotate(-21);				// 5 degrees left
+//		while(pilot.isMoving()) Thread.yield();
+//		for (int i=0; i > -21; i--) {
+//			int value=0;
+//			int numValidMeasurements = 0;
+//			for(int j = 0; j<5; j++) {
+//				measured = us.getDistance();
+//				Delay.msDelay(80);
+//				if (measured != 255) {
+//					value += measured;
+//					numValidMeasurements++;
+//				}
+//			}
+//			if(numValidMeasurements == 0) {
+//				value = measured;
+//			} else {
+//				value = (int) (value/numValidMeasurements);
+//			}
+//			if(min > value) {
+//				min = value;
+//				trough = i;
+//			}
+//			pilot.rotate(-1);				// 5 degrees left
+//			while(pilot.isMoving()) Thread.yield();
+//		}
+//		pilot.rotate(21);				// 5 degrees left
+//		while(pilot.isMoving()) Thread.yield();
+//		System.out.println("         X " + min);
+//		System.out.println("         X " + trough);
+//		return trough;
+//	}
 	
 	static int edgeScan() {
 		UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
@@ -366,8 +366,8 @@ public class Main2 {
 
 	public static void mainAlgorithm(DifferentialPilot pilot) {
 
-		int peakRot;  //rotation direction of supposed can position
-		int peakDist; //distance to supposed can position
+		int troughRot;  //rotation direction of supposed can position
+		int troughDist; //distance to supposed can position
 		line = false;
 
 		while(true){
@@ -375,9 +375,9 @@ public class Main2 {
 
 			int[] rotationArray = rotateNscan(); //get array with distance values
 
-			peakRot = findPeak(rotationArray);	//find angle in which the pedestal possible is (distance peak)	
+			troughRot = findTrough(rotationArray);	//find angle in which the pedestal possible is (distance trough)	
 
-			if (peakRot == -1000) {					//no peak found, error handling -> avoid obstacle (try again later)
+			if (troughRot == -1000) {					//no trough found, error handling -> avoid obstacle (try again later)
 
 				int angle = findMaxDistance(rotationArray); 
 				int optimAngle; 
@@ -405,8 +405,8 @@ public class Main2 {
 				}
 				continue;						//start turning and measuring again
 			}
-			peakDist = rotationArray[peakRot];
-			if(driveNGrabCan(peakRot, peakDist)) { //true if can found and grabbed
+			troughDist = rotationArray[troughRot];
+			if(driveNGrabCan(troughRot, troughDist)) { //true if can found and grabbed
 				findLine();
 				return; 							//continue 
 			}
@@ -510,38 +510,38 @@ public class Main2 {
 //		Delay.msDelay(1000);
 //	}
 	
-	static boolean driveNGrabCan(int peakRot, int peakDist) {
+	static boolean driveNGrabCan(int troughRot, int troughDist) {
 
 		boolean setDown = false;
 
 		Sound.setVolume(80);
-		if(peakRot >= 36) peakRot = peakRot - 72;	//turn max 180° 
-		if(rotate(peakRot*5)){ //convert to degree and rotate
+		if(troughRot >= 36) troughRot = troughRot - 72;	//turn max 180° 
+		if(rotate(troughRot*5)){ //convert to degree and rotate
 			pilot.rotate(-pilot.getAngleIncrement());
 			return false;
 		};					
 
-		if(peakDist > 82) {							
+		if(troughDist > 82) {							
 
 			Sound.playNote(Sound.FLUTE, 300, 1000);
-			System.out.println("         A " + peakDist);
+			System.out.println("         A " + troughDist);
 			if(drive(300))return false;
 		}
-		else if(peakDist > 22) {
+		else if(troughDist > 22) {
 
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
-			System.out.println("         B " + peakDist);
-			if(drive((peakDist-20)*10))return false;
+			System.out.println("         B " + troughDist);
+			if(drive((troughDist-20)*10))return false;
 
-			//int peak = preciseScan();
-			int peak = edgeScan();
-			if(peak == -1000) return false;
+			//int trough = preciseScan();
+			int trough = edgeScan();
+			if(trough == -1000) return false;
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
-			System.out.println("         C " + peakDist);
-			rotate(peak);
+			System.out.println("         C " + troughDist);
+			rotate(trough);
 			
 			UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
 			while(us.getDistance()>7) {		//drive to can stopping 7 cm in front of u.s.sensor
@@ -554,17 +554,17 @@ public class Main2 {
 			//			Delay.msDelay(4000);		//wait to ensure claw closure
 			setDown = true;			//can now grabbed
 			Sound.playNote(Sound.FLUTE, 1500, 1000);
-			System.out.println("         C " + peakDist);
+			System.out.println("         C " + troughDist);
 			drive(-100);
 		} else {
-			//int peak = preciseScan();
-			int peak = edgeScan();
-			if(peak == -1000) return false;
+			//int trough = preciseScan();
+			int trough = edgeScan();
+			if(trough == -1000) return false;
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
 			Sound.playNote(Sound.FLUTE, 500, 1000);
-			System.out.println("         C " + peakDist);
-			rotate(peak);					// -6 due to high tech sensors
+			System.out.println("         C " + troughDist);
+			rotate(trough);					// -6 due to high tech sensors
 		
 			UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
 			while(us.getDistance()>7) {		//drive to can stopping 7 cm in front of u.s.sensor
@@ -576,7 +576,7 @@ public class Main2 {
 			//			Delay.msDelay(4000);		//wait to ensure claw closure
 			setDown = true;			//can now grabbed
 			Sound.playNote(Sound.FLUTE, 1500, 1000);
-			System.out.println("         C " + peakDist);
+			System.out.println("         C " + troughDist);
 			drive(-100);
 		}
 
