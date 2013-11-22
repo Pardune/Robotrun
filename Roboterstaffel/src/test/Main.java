@@ -13,13 +13,22 @@ import lejos.util.Delay;
 
 import java.lang.Math;
 
+/**
+ * Contains the main method for the can transportation of robot1
+ * and all search and move methods except for line handling
+ * All methods except for main, mainAlgorithm and driveNGrabCan are interchangeable between Main and Main2.
+ * @author Birger Lüers, Tim Kohlmeier, Anton Komarov, Stefan Schuler
+ * @version 2.5
+ */
 public class Main {
 
 	static DifferentialPilot pilot = new DifferentialPilot(43.2f, 160f, Motor.A, Motor.B, false);
 	static boolean line = false;
 
 	/**
-	 * @param args
+	 * @param maxDistance is one of the biggest sums of 9 neighboring distances
+	 * @param maxDistanceRot is the corresponding rotation of the middle distance in maxDistance
+	 * @param start is a random integer between 0 and 71 to avoid a robot movement loop
 	 */
 
 	static int findMaxDistance(int[] rotationArray) {	//calculate to biggest distance, makes collisions unlikely but still possible

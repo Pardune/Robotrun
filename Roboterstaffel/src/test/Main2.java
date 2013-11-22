@@ -11,6 +11,13 @@ import lejos.nxt.UltrasonicSensor;
 import lejos.robotics.navigation.DifferentialPilot;
 import lejos.util.Delay;
 
+/**
+ * Contains the main method for the can transportation of robot2
+ * and all search and move methods except for line handling.
+ * All methods except for main, mainAlgorithm and driveNGrabCan are interchangeable between Main and Main2.
+ * @author Birger Lüers, Tim Kohlmeier, Anton Komarov, Stefan Schuler
+ * @version 2.1
+ */
 public class Main2 {
 
 	static DifferentialPilot pilot = new DifferentialPilot(43.2f, 160f, Motor.A, Motor.B, false);
@@ -29,7 +36,7 @@ public class Main2 {
 					+ rotationArray[(i+76)%72] + rotationArray[(i+77)%72] + rotationArray[(i+78)%72]+ rotationArray[(i+79)%72] + rotationArray[(i+80)%72];
 			if(newDistance > maxDistance) {
 				maxDistance = newDistance;
-				maxDistanceRot = (i+76)%72;;
+				maxDistanceRot = (i+76)%72;
 			}
 		}
 		return maxDistanceRot;
